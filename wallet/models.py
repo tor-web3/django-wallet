@@ -29,7 +29,9 @@ class Chain(CreateUpdateTracker):
     explorer_url = models.CharField(verbose_name=_("Explorer URL"),max_length=255,null=True,blank=True)
 
     def __str__(self):
-        return f"{self.chain_name}[{self.chain_network}]"
+        if 'mainnet' != self.chain_network:
+            return f"{self.chain_name}[{self.chain_network}]"
+        return self.chain_name
 
     class Meta:
         verbose_name = _('chain')
@@ -42,7 +44,7 @@ class Pubkey(CreateUpdateTracker):
     chain = models.ForeignKey(Chain, on_delete=models.SET_NULL,null=True)
     
     def __str__(self):
-        return f"Public Key@{self.user}[{self.chain}]"
+        return f"{self.public_key[:6]}...{self.public_key[6:]}"
     
     class Meta:
         verbose_name = _('public key')
@@ -69,7 +71,7 @@ class Token(CreateUpdateTracker):
     )
 
     def __str__(self) -> str:
-        return f"{self.token_name}"
+        return f"{self.token_symbol}"
 
     class Meta:
         verbose_name = _('Token')
@@ -108,6 +110,7 @@ class Address(CreateUpdateTracker):
 
     def __str__(self):
         return f"{self.address}"
+        
     class Meta:
         verbose_name = _('address')
         verbose_name_plural = _('addresses')
