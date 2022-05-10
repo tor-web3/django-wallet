@@ -17,7 +17,8 @@ class Command(BaseCommand):
         parser.add_argument('-c','--chain', nargs='?', type=str,
                             help='Generate wallet address based on blockchain.(default: TRX)')
         parser.add_argument('-i','--index', nargs='?', type=int,
-                            help='Each user has an independent set of address numbers, and addresses with the same number are the same.(default: new address)')
+                            help='Each user has an independent set of address numbers, and '\
+                                'addresses with the same number are the same.(default: new address)')
 
     def handle(self, *args, **options):
         from wallet.helpers import get_deposit_address
