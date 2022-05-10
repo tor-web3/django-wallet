@@ -41,7 +41,7 @@ class Pubkey(CreateUpdateTracker):
     user = models.ForeignKey(get_user_model(),related_name='wallet_pubkey',blank=True,null=True,verbose_name=_("User ID"),on_delete=models.CASCADE)
     public_key = models.CharField(verbose_name=_("Account Extended Public Key"),max_length=128)
 
-    chain = models.ForeignKey(Chain, on_delete=models.SET_NULL,null=True)
+    chain = models.ForeignKey(Chain, on_delete=models.CASCADE)
     
     def __str__(self):
         return f"{self.public_key[:6]}...{self.public_key[6:]}"
@@ -54,7 +54,7 @@ class Pubkey(CreateUpdateTracker):
 
 
 class Token(CreateUpdateTracker):
-    chain = models.ForeignKey(Chain, on_delete=models.SET_NULL,null=True)
+    chain = models.ForeignKey(Chain, on_delete=models.CASCADE)
     
     contract_address = models.CharField(verbose_name=_("Contract Address"),
                                         max_length=128, blank=True, null=True,)
@@ -87,7 +87,7 @@ class Address(CreateUpdateTracker):
     pubkey = models.ForeignKey(Pubkey,related_name="wallet_address",verbose_name=_("Public Key"),
                             on_delete=models.CASCADE)
     
-    chain = models.ForeignKey(Chain, related_name="wallet_address",on_delete=models.SET_NULL, null=True)
+    chain = models.ForeignKey(Chain, related_name="wallet_address",on_delete=models.CASCADE)
 
     label = models.CharField(verbose_name=_('Label'),max_length=128,
                             null=True,blank=True,help_text=_('Label/Tag/Memo'))
