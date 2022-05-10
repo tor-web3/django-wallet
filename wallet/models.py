@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
-from .constant import *
+from wallet.constant import *
 
 
 ##################可以根据现有脚手架模型进行替换####################
