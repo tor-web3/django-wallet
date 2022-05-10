@@ -14,9 +14,8 @@ logger = getLogger(__name__)
 def get_deposit_address(user, chain_symbol, index=None, new_address=False) ->Address:
     return generate_address(user, chain_symbol, index, DEPOSIT, new_address)
 
-def get_system_lease_address(user,chain_symbol):
+def get_system_lease_address(user,chain_symbol) -> Address:
     return generate_address(user, chain_symbol,0,SYSTEM_LEASE,False)
-
 
 def generate_address(user, chain_symbol,index:int=None, type=None, new_address=True) -> Address:
     """
@@ -53,8 +52,7 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
         
         # 若已经存在该地址则返回，没有则创建
         try:
-            address = Address.objects.get(user=user,index=index).address
-            return address
+            return Address.objects.get(user=user,index=index)
         except Address.DoesNotExist as e:
             # 创建钱包地址
             hdwallet: HDWallet = HDWallet(
@@ -64,7 +62,7 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
             hdwallet.from_path(path=f"m/{index}")
             address = hdwallet.p2pkh_address()
 
-            Address.objects.create(
+        return Address.objects.create(
                 user=user,
                 pubkey=pubkey,
                 chain=pubkey.chain,
@@ -72,6 +70,5 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
                 type = type,
                 address=address
             )
-        return address
     except Exception as e:
         logger.error(f"wallet.generate_address:{e.args}")

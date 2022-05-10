@@ -17,5 +17,5 @@ class HelpersTestCase(TestCase):
         )        
 
     def test_get_deposit_address(self):
-        address = get_deposit_address(self.user, "TRX")
-        self.assertEqual(address,'TQZmyGG5NBvE7NQSshHk4P1yuNJXcBkh3H',"error")
+        address = get_deposit_address(self.user, "TRX").address
+        self.assertEqual(address,'TQZmyGG5NBvE7NQSshHk4P1yuNJXcBkh3H',"deposit error")

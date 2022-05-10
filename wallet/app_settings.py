@@ -33,7 +33,7 @@ class AppSettings(object):
             "eth_account_public_key":"xpub6Biz4AscV4t66L44ateUnaSN7oMjfQFBxxmdER195EZEEGkvJ7GPK8c1u6ipVUVMWxEJvGSjhiGLvFQrUAXoZLwHPLtQCsuWbEECUHCRdXW",
         })
     
-    def ACCOUNT_PUBLIC_KEY(self,chain_symbol):
+    def ACCOUNT_PUBLIC_KEY(self,chain_symbol) -> str:
         chain_symbol = chain_symbol.lower()
         return self.DEFAULT_WALLET[f'{chain_symbol}_account_public_key']
 
