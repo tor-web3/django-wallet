@@ -11,10 +11,10 @@ import inspect
 import unicodedata
 import binascii
 
-from hdwallet import cryptocurrencies
-from .cryptocurrencies import (
-    get_cryptocurrency, Cryptocurrency
-)
+from wallet.hdwallet import cryptocurrencies
+# from .cryptocurrencies import (
+#     get_cryptocurrency, Cryptocurrency
+# )
 from .libs.base58 import check_decode
 
 # Alphabet and digits.
@@ -28,7 +28,7 @@ def _unhexlify(integer: int):
         return unhexlify("%x" % integer)
 
 
-def get_semantic(_cryptocurrency: Cryptocurrency, version: bytes, key_type: str) -> str:
+def get_semantic(_cryptocurrency: cryptocurrencies.Cryptocurrency, version: bytes, key_type: str) -> str:
     for name, cryptocurrency in inspect.getmembers(cryptocurrencies):
         if inspect.isclass(cryptocurrency):
             if issubclass(cryptocurrency, cryptocurrencies.Cryptocurrency) and cryptocurrency == _cryptocurrency:
@@ -322,7 +322,7 @@ def is_root_xprivate_key(xprivate_key: str, symbol: str) -> bool:
     decoded_xprivate_key = check_decode(xprivate_key)
     if len(decoded_xprivate_key) != 78:  # 78, 156
         raise ValueError("Invalid xprivate key.")
-    cryptocurrency = get_cryptocurrency(symbol=symbol)
+    cryptocurrency = cryptocurrencies.get_cryptocurrency(symbol=symbol)
     semantic = get_semantic(_cryptocurrency=cryptocurrency, version=decoded_xprivate_key[:4], key_type="private_key")
     version = cryptocurrency.EXTENDED_PRIVATE_KEY.__getattribute__(
         semantic.upper()
@@ -337,7 +337,7 @@ def is_root_xpublic_key(xpublic_key: str, symbol: str) -> bool:
     decoded_xpublic_key = check_decode(xpublic_key)
     if len(decoded_xpublic_key) != 78:  # 78, 156
         raise ValueError("Invalid xpublic key.")
-    cryptocurrency = get_cryptocurrency(symbol=symbol)
+    cryptocurrency = cryptocurrencies.get_cryptocurrency(symbol=symbol)
     semantic = get_semantic(_cryptocurrency=cryptocurrency, version=decoded_xpublic_key[:4], key_type="public_key")
     version = cryptocurrency.EXTENDED_PUBLIC_KEY.__getattribute__(
         semantic.upper()
