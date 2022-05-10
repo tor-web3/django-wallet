@@ -43,11 +43,15 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
         # 确认最新的地址下标
         if index is None:
             try:
-                index = Address.objects.filter(user=user,chain__chain_symbol=chain_symbol).order_by("-index").first().index
+                index=0
+                address = Address.objects.filter(user=user,chain__chain_symbol=chain_symbol).order_by("-index").first()
+                if address:
+                    index = address.index
                 if new_address:
                     index = index + 1
             except Address.DoesNotExist as e:
-                index=0
+                # index=0
+                pass
         
         # 若已经存在该地址则返回，没有则创建
         try:
