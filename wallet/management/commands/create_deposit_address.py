@@ -12,8 +12,9 @@ class Command(BaseCommand):
     help = "Create Deposit Address"
 
     def add_arguments(self, parser):
+        self.username_help = 'User Unique username (Required)'
         parser.add_argument('-u','--username', nargs='?', type=str,
-                            help='User Unique username (Required)')
+                            help=self.username_help)
         parser.add_argument('-c','--chain', nargs='?', type=str,
                             help='Generate wallet address based on blockchain.(default: TRX)')
         parser.add_argument('-i','--index', nargs='?', type=int,
@@ -28,7 +29,8 @@ class Command(BaseCommand):
             username = options.get('username',None)
             user = get_user_model().objects.get(username=username)
         except Exception as e:
-            logger.error(f"User not found. {e.args}")
+            logger.warning(f"{self.username_help}")
+            logger.error(e.args)
             return
 
         chain = options['chain'] if options['chain'] else "TRX"
