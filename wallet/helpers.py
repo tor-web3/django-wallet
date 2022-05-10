@@ -1,17 +1,15 @@
-
-from logging import getLogger
-logger = getLogger(__name__)
-
-from .models import (
+from wallet.models import (
     Pubkey,
     Chain,
     Address,
 )
-from .constant import *
+from wallet.constant import *
 
-from hdwallet import HDWallet
-from . import app_settings
+from wallet.hdwallet import HDWallet
+from wallet import app_settings
 
+from logging import getLogger
+logger = getLogger(__name__)
 
 def get_deposit_address(user, chain_symbol, index=None, new_address=False) ->Address:
     return generate_address(user, chain_symbol, index, DEPOSIT, new_address)
@@ -47,16 +45,16 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
         # 确认最新的地址下标
         if index is None:
             try:
-                index = Address.objects.filter(user=user).latest("created_time").index
+                index = Address.objects.filter(user=user).latest("created_at").index
                 if new_address:
                     index = index + 1
             except Address.DoesNotExist as e:
-                logger.error(e.args)
                 index=0
         
         # 若已经存在该地址则返回，没有则创建
         try:
-            return Address.objects.get(user=user,index=index)
+            address = Address.objects.get(user=user,index=index).address
+            return address
         except Address.DoesNotExist as e:
             # 创建钱包地址
             hdwallet: HDWallet = HDWallet(
@@ -64,14 +62,16 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
             )
             hdwallet.from_xpublic_key(pubkey.public_key)
             hdwallet.from_path(path=f"m/{index}")
-            
-            return Address.objects.create(
+            address = hdwallet.p2pkh_address()
+
+            Address.objects.create(
                 user=user,
                 pubkey=pubkey,
                 chain=pubkey.chain,
                 index=index,
                 type = type,
-                address=hdwallet.p2pkh_address()
+                address=address
             )
+        return address
     except Exception as e:
         logger.error(f"wallet.generate_address:{e.args}")
