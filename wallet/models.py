@@ -39,7 +39,7 @@ class Chain(CreateUpdateTracker):
 
 class Pubkey(CreateUpdateTracker):
     user = models.ForeignKey(get_user_model(),related_name='wallet_pubkey',blank=True,null=True,verbose_name=_("User ID"),on_delete=models.CASCADE)
-    public_key = models.CharField(verbose_name=_("Account Extended Public Key"),max_length=128,unique=True)
+    public_key = models.CharField(verbose_name=_("Account Extended Public Key"),max_length=128)
 
     chain = models.ForeignKey(Chain, on_delete=models.SET_NULL,null=True)
     
@@ -49,6 +49,7 @@ class Pubkey(CreateUpdateTracker):
     class Meta:
         verbose_name = _('public key')
         verbose_name_plural = _('public key')
+        unique_together = [("public_key", "chain")]
 
 
 
