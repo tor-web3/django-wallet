@@ -48,7 +48,7 @@ msgstr ""
 
 #: .\models.py:16
 msgid "Explorer URL"
-msgstr ""
+msgstr "区块链浏览器"
 
 #: .\models.py:22 .\models.py:23
 msgid "chain"
@@ -64,19 +64,19 @@ msgstr ""
 
 #: .\models.py:37 .\models.py:38
 msgid "public key"
-msgstr ""
+msgstr "公钥"
 
 #: .\models.py:45
 msgid "Contract Address"
-msgstr ""
+msgstr "合约地址"
 
 #: .\models.py:47
 msgid "Token Symbol"
-msgstr ""
+msgstr "代币单位"
 
 #: .\models.py:48
 msgid "Token Name"
-msgstr ""
+msgstr "代币名称"
 
 #: .\models.py:49
 msgid "Token Decimal"
