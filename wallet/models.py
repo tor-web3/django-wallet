@@ -5,14 +5,27 @@ from django.utils.translation import gettext_lazy as _
 # Create your models here.
 from .constant import *
 
-class Chain(models.Model):
+
+##################可以根据现有脚手架模型进行替换####################
+class CreateTracker(models.Model):
+    created_at = models.DateTimeField(_("Created Time"),auto_now_add=True,editable=False)
+
+    class Meta:
+        abstract = True
+        ordering = ('-created_at',)
+
+class CreateUpdateTracker(CreateTracker):
+    updated_at = models.DateTimeField(_("Updated Time"),auto_now=True,editable=False)
+
+    class Meta(CreateTracker.Meta):
+        abstract = True
+#################################################################
+
+class Chain(CreateUpdateTracker):
     chain_name = models.CharField(verbose_name=_("Chain Name"), max_length=32, default="Tron")
     chain_network = models.CharField(verbose_name=_("Chain Network"), max_length=32)
     chain_symbol = models.CharField(verbose_name=_("Chain Token Symbol"), max_length=32, default="TRX")
     
-    created_time = models.DateTimeField(_("Created Time"), auto_now_add=True)
-    updated_time = models.DateTimeField(_("Updated Time"), auto_now=True)
-
     explorer_url = models.CharField(verbose_name=_("Explorer URL"),max_length=255,null=True,blank=True)
 
     def __str__(self):
@@ -22,13 +35,11 @@ class Chain(models.Model):
         verbose_name = _('chain')
         verbose_name_plural = _('chain')
 
-class Pubkey(models.Model):
+class Pubkey(CreateUpdateTracker):
     user = models.ForeignKey(get_user_model(),related_name='wallet_pubkey',blank=True,null=True,verbose_name=_("User ID"),on_delete=models.CASCADE)
     public_key = models.CharField(verbose_name=_("Account Extended Public Key"),max_length=128,unique=True)
 
     chain = models.ForeignKey(Chain, on_delete=models.SET_NULL,null=True)
-    
-    created_time = models.DateTimeField(_("Created Time"), auto_now_add=True)
     
     def __str__(self):
         return f"Public Key@{self.user}[{self.chain}]"
@@ -39,7 +50,7 @@ class Pubkey(models.Model):
 
 
 
-class Token(models.Model):
+class Token(CreateUpdateTracker):
     chain = models.ForeignKey(Chain, on_delete=models.SET_NULL,null=True)
     
     contract_address = models.CharField(verbose_name=_("Contract Address"),
@@ -56,8 +67,6 @@ class Token(models.Model):
             "Unselect this instead of deleting address."
         ),
     )
-    created_time = models.DateTimeField(_("Created Time"), auto_now_add=True)
-    updated_time = models.DateTimeField(_("Updated Time"), auto_now=True)
 
     def __str__(self) -> str:
         return f"{self.token_name}"
@@ -69,7 +78,7 @@ class Token(models.Model):
 
 
 
-class Address(models.Model):
+class Address(CreateUpdateTracker):
     user = models.ForeignKey(get_user_model(),related_name='wallet_address',null=True,verbose_name=_("User ID"),
                             on_delete=models.CASCADE)
     pubkey = models.ForeignKey(Pubkey,related_name="wallet_address",verbose_name=_("Public Key"),
@@ -95,7 +104,6 @@ class Address(models.Model):
             "Unselect this instead of deleting address."
         ),
     )
-    created_time = models.DateTimeField(_("Created Time"), auto_now_add=True,editable=False)
 
 
     def __str__(self):
