@@ -27,10 +27,9 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
             pubkey = Pubkey.objects.get(user=user,chain__chain_symbol=chain_symbol)
         except Pubkey.DoesNotExist as e:
             chain = Chain.objects.filter(chain_symbol=chain_symbol).first()
-                
-            hdwallet: HDWallet = HDWallet(
-                symbol=chain_symbol
-            )
+
+            hdwallet: HDWallet = HDWallet(symbol=chain_symbol, use_default_path=False)
+            
             hdwallet.from_xpublic_key(app_settings.ACCOUNT_PUBLIC_KEY(chain_symbol))
             hdwallet.from_path(path=f"m/{user.pk}")
 
@@ -39,12 +38,12 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
                 chain=chain,
                 public_key= hdwallet.xpublic_key(),
             )
-        user = pubkey.user
+        # user = pubkey.user
         
         # 确认最新的地址下标
         if index is None:
             try:
-                index = Address.objects.filter(user=user).latest("created_at").index
+                index = Address.objects.filter(user=user,chain__chain_symbol=chain_symbol).order_by("-index").first().index
                 if new_address:
                     index = index + 1
             except Address.DoesNotExist as e:
@@ -52,12 +51,10 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
         
         # 若已经存在该地址则返回，没有则创建
         try:
-            return Address.objects.get(user=user,index=index)
+            return Address.objects.get(user=user,chain__chain_symbol=chain_symbol,index=index)
         except Address.DoesNotExist as e:
             # 创建钱包地址
-            hdwallet: HDWallet = HDWallet(
-                symbol=chain_symbol
-            )
+            hdwallet: HDWallet = HDWallet(symbol=chain_symbol, use_default_path=False)
             hdwallet.from_xpublic_key(pubkey.public_key)
             hdwallet.from_path(path=f"m/{index}")
             address = hdwallet.p2pkh_address()
@@ -67,7 +64,7 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
                 pubkey=pubkey,
                 chain=pubkey.chain,
                 index=index,
-                type = type,
+                type=type,
                 address=address
             )
     except Exception as e:
