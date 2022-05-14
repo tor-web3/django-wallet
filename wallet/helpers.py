@@ -38,7 +38,6 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
                 chain=chain,
                 public_key= hdwallet.xpublic_key(),
             )
-        # user = pubkey.user
         
         # 确认最新的地址下标
         if index is None:
@@ -50,7 +49,6 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
                 if new_address:
                     index = index + 1
             except Address.DoesNotExist as e:
-                # index=0
                 pass
         
         # 若已经存在该地址则返回，没有则创建
@@ -72,4 +70,4 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
                 address=address
             )
     except Exception as e:
-        logger.error(f"wallet.generate_address:{e.args}")
+        logger.error(msg="Exception while generating wallet address:", exc_info=e)
