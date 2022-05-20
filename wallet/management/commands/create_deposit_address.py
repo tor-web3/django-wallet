@@ -9,7 +9,11 @@ logger = getLogger(__name__)
        
 
 class Command(BaseCommand):
-    help = "Create Deposit Address"
+    help = """
+    Create Deposit Address: 
+    
+    python manage.py create_deposit_address -u [username or uid]
+    """
 
     def add_arguments(self, parser):
         self.username_help = 'User Unique username (Required)'
