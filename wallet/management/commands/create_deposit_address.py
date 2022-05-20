@@ -1,6 +1,5 @@
 
 import os
-# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lender.settings')
 
 from django.core.management.base import BaseCommand
 
