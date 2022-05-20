@@ -44,7 +44,7 @@ class Pubkey(CreateUpdateTracker):
     chain = models.ForeignKey(Chain, on_delete=models.CASCADE)
     
     def __str__(self):
-        return f"{self.public_key[:6]}...{self.public_key[6:]}"
+        return f"{self.public_key[:8]}...{self.public_key[-8:]}"
     
     class Meta:
         verbose_name = _('public key')
