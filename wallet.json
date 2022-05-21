@@ -22,6 +22,20 @@
         }
     },
     {
+        "model":"wallet.rpc",
+        "fields":{
+            "created_at":"2022-05-21T03:11:20.347Z",
+            "updated_at":"2022-05-21T03:11:20.347Z",
+            "chain":2,
+            "company":"infura",
+            "alias":"test",
+            "endpoint":"https://mainnet.infura.io/v3/8a5284b35807498aa04f95fc580a76ec",
+            "username":null,
+            "password":null,
+            "auth":"NORMAL"
+        }
+    },
+    {
         "model":"wallet.token",
         "fields":{
             "created_at":"2022-05-10T14:30:26.960Z",

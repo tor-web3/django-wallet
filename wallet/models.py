@@ -37,6 +37,19 @@ class Chain(CreateUpdateTracker):
         verbose_name = _('chain')
         verbose_name_plural = _('chain')
 
+class RPC(CreateUpdateTracker):
+    chain = models.ForeignKey(Chain, related_name='wallet_rpc', on_delete=models.CASCADE)
+    company = models.CharField(verbose_name=_("company"),max_length=128)
+    alias = models.CharField(verbose_name=_("alias"),max_length=128,blank=True,null=True,)
+    endpoint = models.CharField(verbose_name=_("endpoint"),max_length=128)
+    username = models.CharField(verbose_name=_("username"),max_length=128,blank=True,null=True,)
+    password = models.CharField(verbose_name=_("password"),max_length=128,blank=True,null=True,)
+    auth = models.CharField(verbose_name=_("auth"),max_length=128,choices=AUTH_TYPE,default=NORMAL)
+    
+    class Meta:
+        verbose_name = _('RPC')
+        verbose_name_plural = _('RPC')
+
 class Pubkey(CreateUpdateTracker):
     user = models.ForeignKey(get_user_model(),related_name='wallet_pubkey',blank=True,null=True,verbose_name=_("User ID"),on_delete=models.CASCADE)
     public_key = models.CharField(verbose_name=_("Account Extended Public Key"),max_length=128)
@@ -115,3 +128,13 @@ class Address(CreateUpdateTracker):
     class Meta:
         verbose_name = _('address')
         verbose_name_plural = _('addresses')
+
+
+
+class State(CreateUpdateTracker):
+    address = models.ForeignKey(Address, related_name="wallet_state",on_delete=models.CASCADE)
+    token = models.ManyToManyField(to=Token,related_name="wallet_state")
+    balance = models.JSONField(verbose_name=_('balance'))
+    next_time = models.DateTimeField(_("Created Time"),auto_now_add=True,editable=False)
+    is_active = models.BooleanField(verbose_name=_('active'),default=False)
+    rpc = models.ForeignKey(RPC, related_name="wallet_state", on_delete=models.CASCADE)
