@@ -46,6 +46,9 @@ class RPC(CreateUpdateTracker):
     password = models.CharField(verbose_name=_("password"),max_length=128,blank=True,null=True,)
     auth = models.CharField(verbose_name=_("auth"),max_length=128,choices=AUTH_TYPE,default=NORMAL)
     
+    def __str__(self):
+        return f"{self.alias}-[{self.company}]"
+
     class Meta:
         verbose_name = _('RPC')
         verbose_name_plural = _('RPC')
@@ -85,7 +88,7 @@ class Token(CreateUpdateTracker):
     )
 
     def __str__(self) -> str:
-        return f"{self.token_symbol}"
+        return f"{self.token_name}"
 
     class Meta:
         verbose_name = _('Token')
@@ -133,8 +136,27 @@ class Address(CreateUpdateTracker):
 
 class State(CreateUpdateTracker):
     address = models.ForeignKey(Address, related_name="wallet_state",on_delete=models.CASCADE)
-    token = models.ManyToManyField(to=Token,related_name="wallet_state")
     balance = models.JSONField(verbose_name=_('balance'))
-    next_time = models.DateTimeField(_("Created Time"),auto_now_add=True,editable=False)
-    is_active = models.BooleanField(verbose_name=_('active'),default=False)
+    next_time = models.DateTimeField(
+        _("Created Time"),editable=False,
+        auto_now=True,
+        help_text=_(
+            "When to run the next test"
+        )
+    )
+    is_active = models.BooleanField(
+        verbose_name=_('active'),default=True,
+        help_text=_(
+            "Whether it is necessary to detect the operating status of the address"
+        )
+    )
+    is_update = models.BooleanField(
+        verbose_name=_('update'),default=False,
+        help_text=_(
+            "Status of address update"
+        )
+    )
     rpc = models.ForeignKey(RPC, related_name="wallet_state", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.is_update}"
