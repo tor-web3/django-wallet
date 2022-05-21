@@ -9,7 +9,7 @@ class RPCAdmin(admin.ModelAdmin):
     
 class StateAdmin(admin.ModelAdmin):
 
-    list_display = ("address","balance","next_time","is_active","rpc","next_time")
+    list_display = ("address","balance","is_active","rpc","stop_at","created_at")
 
 admin.site.register(RPC,RPCAdmin)
 admin.site.register(State,StateAdmin)

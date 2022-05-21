@@ -6,7 +6,7 @@ from wallet.models import Chain,CreateUpdateTracker,Address
 from wallet.chainstate.constant import *
 
 class RPC(CreateUpdateTracker):
-    chain = models.ForeignKey(Chain, related_name='wallet_rpc', on_delete=models.CASCADE)
+    chain = models.ForeignKey(Chain, related_name='wallet_chainstate_rpc', on_delete=models.CASCADE)
     company = models.CharField(verbose_name=_("company"),max_length=128)
     alias = models.CharField(verbose_name=_("alias"),max_length=128,blank=True,null=True,)
     endpoint = models.CharField(verbose_name=_("endpoint"),max_length=128)
@@ -29,13 +29,12 @@ class StateManager(models.Manager):
 class State(CreateUpdateTracker):
     objects = StateManager()
 
-    address = models.ForeignKey(Address, related_name="wallet_state",on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, related_name="wallet_chainstate_state",on_delete=models.CASCADE)
     balance = models.JSONField(verbose_name=_('balance'))
-    next_time = models.DateTimeField(
-        _("Created Time"),editable=False,
-        auto_now=True,
+    stop_at = models.DateTimeField(
+        _("Stop Time"),editable=False,
         help_text=_(
-            "When to run the next test"
+            "When to stop the test"
         )
     )
     is_active = models.BooleanField(
@@ -50,7 +49,7 @@ class State(CreateUpdateTracker):
             "Status of address update"
         )
     )
-    rpc = models.ForeignKey(RPC, related_name="wallet_state", on_delete=models.CASCADE)
+    rpc = models.ForeignKey(RPC, related_name="wallet_chainstate_state", on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.is_update}"
