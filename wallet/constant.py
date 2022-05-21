@@ -8,8 +8,3 @@ ADDRESS_TYPE = (
     (SYSTEM_LEASE,_("system lease")),
 )
 
-
-NORMAL="NORMAL"
-AUTH_TYPE = (
-    (NORMAL, _("normal")),
-)
