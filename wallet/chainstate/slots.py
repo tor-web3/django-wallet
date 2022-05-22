@@ -7,6 +7,8 @@ from django.utils import timezone
 from wallet.models import Address
 from wallet.chainstate.models import State,RPC
 
+from logging import getLogger
+logger = getLogger(__name__)
 
 @receiver(post_save, sender=Address)
 def handle_post_save_address(sender, instance:Address, created:bool, **kwargs):
@@ -23,7 +25,7 @@ def handle_post_save_address(sender, instance:Address, created:bool, **kwargs):
     rpc_obj = RPC.objects.filter(chain=instance.chain).first()
     # 地址有效刷新24小时
     now = timezone.now()
-    end_time = now + timezone.timedelta(hours=24,minutes=0,seconds=0)
+    stop_at = now + timezone.timedelta(hours=24,minutes=0,seconds=0)
     
     # 更新地址状态机
     try:
@@ -33,13 +35,13 @@ def handle_post_save_address(sender, instance:Address, created:bool, **kwargs):
             address=instance
         )
         obj.is_active = True
-        obj.next_time = end_time
+        obj.stop_at = stop_at
         obj.rpc = rpc_obj
-        obj.save(update_fields=['is_active','end_time'])
+        obj.save(update_fields=['is_active','stop_at'])
     except State.DoesNotExist as e:
         obj = State.objects.create(
             address=instance,
             balance='',
             rpc=rpc_obj,
-            stop_at=end_time,
+            stop_at=stop_at,
         )
