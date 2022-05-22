@@ -1,21 +1,29 @@
-from wallet.chainstate.signals import wallet_address_updated
-
-from typing import Union, List, Optional, Dict
-
-from celery.utils.log import get_task_logger
 import requests
-from wallet.chainstate.models import State
-from wallet.chainstate.utils import request_token_balance
-from wallet.models import Token
-
+from typing import Union, List, Optional, Dict
 from jsonrpcclient import parse,Ok
+
 from logging import getLogger
 logger = getLogger(__name__)
 
+from django.utils import timezone
+
+from wallet.models import Token
+from wallet.chainstate.models import State
+from wallet.chainstate.utils import request_token_balance
+
+
 def check_eth_address_status():
+    """
+    检测以太坊地址的余额状态
+    """
+    now = timezone.now()
     token_objs = Token.objects.filter(chain__chain_symbol="ETH")
+    
     for token_obj in token_objs:
-        state_objs = State.objects.filter(rpc__chain=token_obj.chain,is_update=False)[:20]
+        state_objs = State.objects.filter(
+            rpc__chain=token_obj.chain,is_update=False,
+            stop_at__gt=now,
+        )[:20]
         for state_obj in state_objs:
             addr_obj = state_obj.address
             

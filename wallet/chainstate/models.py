@@ -4,6 +4,7 @@ from decimal import Decimal
 # Create your models here.
 from wallet.models import Chain,CreateUpdateTracker,Address
 from wallet.chainstate.constant import *
+from wallet.chainstate.signals import wallet_address_updated
 
 from typing import Any, Optional,List
 
@@ -78,7 +79,13 @@ class State(CreateUpdateTracker):
     def flush(self):
         self.query_count = self.query_count + 1
         update_fileds = self.update_fileds + ['query_count']
+        
         self.save(update_fileds=list(set(update_fileds)))
+        if self.is_update:
+            wallet_address_updated.send(
+                sender=self.__class__,
+                instance = self,
+            )
 
     def __str__(self):
         return f"{self.is_update}"
