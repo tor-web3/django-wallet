@@ -7,3 +7,4 @@ class ChainstateConfig(AppConfig):
     
     def ready(self):
         from wallet.chainstate import slots
+        from wallet.chainstate import tasks

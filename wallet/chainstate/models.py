@@ -5,6 +5,8 @@ from django.utils.translation import gettext_lazy as _
 from wallet.models import Chain,CreateUpdateTracker,Address
 from wallet.chainstate.constant import *
 
+from typing import Any, Optional,List
+
 class RPC(CreateUpdateTracker):
     chain = models.ForeignKey(Chain, related_name='wallet_chainstate_rpc', on_delete=models.CASCADE)
     company = models.CharField(verbose_name=_("company"),max_length=128)
@@ -27,6 +29,11 @@ class StateManager(models.Manager):
         return super().get_queryset().filter(is_active=True)
 
 class State(CreateUpdateTracker):
+    
+    def __init__(self,*args,**kwargs):
+        self.update_fileds = []
+        super(State,self).__init__(*args,**kwargs)
+        
     objects = StateManager()
 
     address = models.ForeignKey(Address, related_name="wallet_chainstate_state",on_delete=models.CASCADE)
@@ -49,7 +56,26 @@ class State(CreateUpdateTracker):
             "Status of address update"
         )
     )
+    query_count = models.IntegerField(verbose_name=_('query count'),default=0)
     rpc = models.ForeignKey(RPC, related_name="wallet_chainstate_state", on_delete=models.CASCADE)
+
+    @property
+    def usdt_balance(self):
+        return self.balance['usdt']
+    
+    @usdt_balance.setter
+    def usdt_balance(self,value:str):
+        if self.balance['usdt'] != value:
+            self.balance = value
+            self.is_update = True
+            self.update_fileds = ['balance','is_update']
+            return self.balance
+        return None
+
+    def flush(self):
+        self.query_count = self.query_count + 1
+        update_fileds = self.update_fileds + ['query_count']
+        self.save(update_fileds=list(set(update_fileds)))
 
     def __str__(self):
         return f"{self.is_update}"

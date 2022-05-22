@@ -15,3 +15,6 @@ python manage.py loaddata wallet.json
 # 创建钱包地址
 python manage.py create_deposit_address -u [username or uid]
 ```
+
+# 其他项目依赖
+jsonrpcclient
