@@ -28,20 +28,19 @@ def handle_post_save_address(sender, instance:Address, created:bool, **kwargs):
     stop_at = now + timezone.timedelta(hours=24,minutes=0,seconds=0)
     
     # 更新地址状态机
-    try:
-        if created:
-            raise State.DoesNotExist("not found")
+    if created:
+        obj = State.objects.create(
+            address=instance,
+            balance=0,
+            rpc=rpc_obj,
+            stop_at=stop_at,
+        )
+    else:
         obj = State.objects.get(
             address=instance
         )
         obj.is_active = True
         obj.stop_at = stop_at
         obj.rpc = rpc_obj
-        obj.save(update_fields=['is_active','stop_at'])
-    except State.DoesNotExist as e:
-        obj = State.objects.create(
-            address=instance,
-            balance='',
-            rpc=rpc_obj,
-            stop_at=stop_at,
-        )
+        obj.save(update_fields=['is_active','stop_at','rpc'])
+            

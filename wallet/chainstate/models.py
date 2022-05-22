@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
+from decimal import Decimal
 # Create your models here.
 from wallet.models import Chain,CreateUpdateTracker,Address
 from wallet.chainstate.constant import *
@@ -37,7 +37,11 @@ class State(CreateUpdateTracker):
     objects = StateManager()
 
     address = models.ForeignKey(Address, related_name="wallet_chainstate_state",on_delete=models.CASCADE)
-    balance = models.JSONField(verbose_name=_('balance'))
+    usdt_balance = models.DecimalField(
+        verbose_name=_('usdt balance'),
+        max_digits=32,decimal_places=8,
+        default=0,
+    )
     stop_at = models.DateTimeField(
         _("Stop Time"),editable=False,
         help_text=_(
@@ -60,16 +64,15 @@ class State(CreateUpdateTracker):
     rpc = models.ForeignKey(RPC, related_name="wallet_chainstate_state", on_delete=models.CASCADE)
 
     @property
-    def usdt_balance(self):
-        return self.balance['usdt']
-    
-    @usdt_balance.setter
-    def usdt_balance(self,value:str):
-        if self.balance['usdt'] != value:
-            self.balance = value
+    def balance(self):
+        return self.usdt_balance
+    @balance.setter
+    def balance(self,value:Decimal):
+        if self.usdt_balance != value:
+            self.usdt_balance = value
             self.is_update = True
-            self.update_fileds = ['balance','is_update']
-            return self.balance
+            self.update_fileds = ['usdt_balance','is_update']
+            return self.usdt_balance
         return None
 
     def flush(self):

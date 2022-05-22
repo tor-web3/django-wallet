@@ -8,16 +8,15 @@ from wallet.chainstate.models import State
 from wallet.chainstate.utils import request_token_balance
 from wallet.models import Token
 
+from jsonrpcclient import parse,Ok
 from logging import getLogger
 logger = getLogger(__name__)
 
-def check_eth_address_status(
-    addresses: List[str],
-):
+def check_eth_address_status():
     token_objs = Token.objects.filter(chain__chain_symbol="ETH")
-    state_objs = State.objects.filter(is_update=False)[:20]
-    for state_obj in state_objs:
-        for token_obj in token_objs:
+    for token_obj in token_objs:
+        state_objs = State.objects.filter(rpc__chain=token_obj.chain,is_update=False)[:20]
+        for state_obj in state_objs:
             addr_obj = state_obj.address
             
             response = requests.post(
@@ -28,12 +27,12 @@ def check_eth_address_status(
                 )
             )
                     
-            parsed = parsed(response.json())
+            parsed = parse(response.json())
             if isinstance(parsed, Ok):
-                print(parsed.result)
-                print(int(parsed.result,16))
+                from decimal import Decimal
+                value:Decimal = Decimal(int(parsed.result,16)) / (10 ** 6)
+                state_obj.balance=value
+                state_obj.flush()
+                
             else:
                 logging.error(parsed.message)
-
-# check_eth_address_status(["asd"])
-    
