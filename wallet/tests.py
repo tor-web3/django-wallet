@@ -10,12 +10,19 @@ from wallet.models import (
 from wallet.helpers import *
 
 
+# python manage.py test wallet.HelpersTestCase
 class HelpersTestCase(TestCase):
+    fixtures = ['wallet.json']
+
     def setUp(self) -> None:
         self.user = get_user_model().objects.create(
             pk=1,
-        )        
+        )
+        
 
-    def test_get_deposit_address(self):
-        address = get_deposit_address(self.user, "TRX").address
-        self.assertEqual(address,'TQZmyGG5NBvE7NQSshHk4P1yuNJXcBkh3H',"deposit error")
+    # python manage.py test wallet.HelpersTestCase.test_generate_deposit_trx_address
+    def test_generate_deposit_address(self):
+        obj = generate_deposit_trx_address(self.user)
+        self.assertEqual(obj.address,'TQZmyGG5NBvE7NQSshHk4P1yuNJXcBkh3H',"deposit error")
+        obj = generate_deposit_eth_address(self.user)
+        self.assertEqual(obj.address,'0xCA1a58A97Cc84285DacE852a5994383A080836a0',"deposit error")

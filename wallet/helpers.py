@@ -1,3 +1,6 @@
+
+from functools import partial
+
 from wallet.models import (
     Pubkey,
     Chain,
@@ -27,6 +30,10 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
             pubkey = Pubkey.objects.get(user=user,chain__chain_symbol=chain_symbol)
         except Pubkey.DoesNotExist as e:
             chain = Chain.objects.filter(chain_symbol=chain_symbol).first()
+            
+            if not chain:
+                # 如果未获取到链信息
+                raise Chain.DoesNotExist(f"尚不支持{chain_symbol},请先添加.")
 
             hdwallet: HDWallet = HDWallet(symbol=chain_symbol, use_default_path=False)
             
@@ -42,11 +49,11 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
         # 确认最新的地址下标
         if index is None:
             try:
-                index=0
                 address = Address.objects.filter(user=user,chain__chain_symbol=chain_symbol).order_by("-index").first()
-                if address:
-                    index = address.index
-                if new_address:
+                 
+                index=0 if not address else address.index
+                
+                if address and new_address:
                     index = index + 1
             except Address.DoesNotExist as e:
                 pass
@@ -71,3 +78,10 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
             )
     except Exception as e:
         logger.error(msg="Exception while generating wallet address:", exc_info=e)
+
+
+generate_eth_address = partial(generate_address, chain_symbol='ETH')
+generate_trx_address = partial(generate_address, chain_symbol='TRX')
+
+generate_deposit_eth_address = partial(generate_eth_address, type=DEPOSIT)
+generate_deposit_trx_address = partial(generate_trx_address, type=DEPOSIT)
