@@ -32,7 +32,7 @@ class StateManager(models.Manager):
 class State(CreateUpdateTracker):
     
     def __init__(self,*args,**kwargs):
-        self.update_fileds = []
+        self.update_fields = []
         super(State,self).__init__(*args,**kwargs)
         
     objects = StateManager()
@@ -75,15 +75,16 @@ class State(CreateUpdateTracker):
         if self.usdt_balance != value:
             self.usdt_balance = value
             self.is_update = True
-            self.update_fileds = ['usdt_balance','is_update']
+            self.update_fields = ['usdt_balance','is_update']
             return self.usdt_balance
         return None
 
     def flush(self):
         self.query_count = self.query_count + 1
-        update_fileds = self.update_fileds + ['query_count']
+        update_fields = self.update_fields + ['query_count']
         
-        self.save(update_fileds=list(set(update_fileds)))
+        fields = list(set(update_fields))
+        self.save(update_fields=fields)
         if self.is_update:
             wallet_address_updated.send(
                 sender=self.__class__,

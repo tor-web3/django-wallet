@@ -27,7 +27,6 @@ def handle_post_save_address(sender, instance:Address, created:bool, **kwargs):
     now = timezone.now()
     stop_at = now + timezone.timedelta(hours=24,minutes=0,seconds=0)
     
-    # 更新地址状态机
     if created:
         obj = State.objects.create(
             address=instance,
@@ -36,6 +35,7 @@ def handle_post_save_address(sender, instance:Address, created:bool, **kwargs):
             stop_at=stop_at,
         )
     else:
+        # 更新地址状态机
         obj = State.objects.get(
             address=instance
         )

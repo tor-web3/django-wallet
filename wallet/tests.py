@@ -20,7 +20,7 @@ class HelpersTestCase(TestCase):
         )
         
 
-    # python manage.py test wallet.HelpersTestCase.test_generate_deposit_trx_address
+    # python manage.py test wallet.HelpersTestCase.test_generate_deposit_address
     def test_generate_deposit_address(self):
         obj = generate_deposit_trx_address(self.user)
         self.assertEqual(obj.address,'TQZmyGG5NBvE7NQSshHk4P1yuNJXcBkh3H',"deposit error")
