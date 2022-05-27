@@ -23,6 +23,8 @@ def handle_post_save_address(sender, instance:Address, created:bool, **kwargs):
         State.DoesNotExist: 该对象未在库中存档
     """
     rpc_obj = RPC.objects.filter(chain=instance.chain).first()
+    if not rpc_obj:
+        logger.warning(f"未找到[{instance.chain}]的RPC接口")
     # 地址有效刷新24小时
     now = timezone.now()
     stop_at = now + timezone.timedelta(hours=24,minutes=0,seconds=0)
