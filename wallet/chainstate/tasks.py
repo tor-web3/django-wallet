@@ -55,22 +55,26 @@ def check_trx_address_status():
     # 获取波场链下所有代币
     token_objs = Token.objects.filter(chain__chain_symbol="TRX")
     for token_obj in token_objs:
+        # 寻找符合对应公链地址的待检测对象
         state_objs = State.objects.filter(
             rpc__chain=token_obj.chain,is_update=False,
             stop_at__gt=now,
         )[:20]
         for state_obj in state_objs:
             addr_obj = state_obj.address
+
+            # 构建地址代币余额请求接口
             host_url = "https://apilist.tronscan.org/api/account/tokens"
             token_info_url = f"{host_url}?address={addr_obj.address}&token={token_obj.token_symbol}"
                             #&start=0&limit=20&hidden=0&show=0&sortType=0"
 
-            # 检测值变化
+            # 检测代币值变化
             response = requests.get(
                 token_info_url
             )
             parsed_data = response.json()['data']
 
+            # 寻找当前检测代币合约地址的对象
             for data in parsed_data:
                 if token_obj.contract_address == data['tokenId']:
                     from decimal import Decimal
