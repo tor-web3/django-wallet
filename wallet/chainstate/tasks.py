@@ -43,4 +43,4 @@ def check_eth_address_status():
                 state_obj.flush()
                 
             else:
-                logging.error(parsed.message)
+                logger.error(parsed.message)

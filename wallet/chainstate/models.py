@@ -62,7 +62,10 @@ class State(CreateUpdateTracker):
         )
     )
     query_count = models.IntegerField(verbose_name=_('query count'),default=0)
-    rpc = models.ForeignKey(RPC, related_name="wallet_chainstate_state", on_delete=models.CASCADE)
+    rpc = models.ForeignKey(
+        RPC, related_name="wallet_chainstate_state", 
+        on_delete=models.CASCADE, null=True
+    )
 
     @property
     def balance(self):
