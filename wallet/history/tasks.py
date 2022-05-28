@@ -56,8 +56,8 @@ def check_trx_address_deposit():
 
             try:
                 for transfer in token_transfer_list:
-                    # 忽略非充值类交易
-                    if transfer['to_address'] == state.address:
+                    if transfer['to_address'] != state.address.address:
+                        # 忽略非充值类交易
                         continue
 
                     if transfer['contractRet'] != 'SUCCESS' or transfer['finalResult'] != 'SUCCESS':
@@ -71,11 +71,11 @@ def check_trx_address_deposit():
                     timestamp = transfer['block_ts']/ 1000
                     
                     deposit = Deposit()
-                    deposit.counterparty_address    = transfer['from_address']
                     deposit.txid                    = transfer['transaction_id']
-                    deposit.amount                  = Decimal(transfer['quant']) / (10 ** token.token_decimal)
+                    deposit.counterparty_address    = transfer['from_address']
                     deposit.deposit_address         = transfer['to_address']
                     deposit.deposit                 = state.address
+                    deposit.amount                  = Decimal(transfer['quant']) / (10 ** token.token_decimal)
                     deposit.token                   = token if token.contract_address == transfer['contract_address'] else None
                     deposit.block_time              = timezone.datetime.fromtimestamp(timestamp,timezone.utc)
                     deposit.save()
