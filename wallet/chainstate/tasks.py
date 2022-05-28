@@ -12,6 +12,15 @@ from wallet.chainstate.models import State
 from wallet.chainstate.utils import request_token_balance
 
 
+def check_address_status(chain:str=None):
+    updated_count = 0
+    if chain is None or chain.upper() == 'ETH':
+        updated_count = check_eth_address_status()
+    if chain is None or chain.upper() == 'TRX':
+        updated_count = updated_count + check_trx_address_status()
+
+    return updated_count
+
 def check_eth_address_status():
     """
     检测以太坊地址的余额状态
@@ -19,6 +28,7 @@ def check_eth_address_status():
     now = timezone.now()
     token_objs = Token.objects.filter(chain__chain_symbol="ETH")
     
+    update_count = 0
     for token_obj in token_objs:
         state_objs = State.objects.filter(
             rpc__chain=token_obj.chain,is_update=False,
@@ -41,10 +51,13 @@ def check_eth_address_status():
                 value:Decimal = Decimal(int(parsed.result,16)) / (10 ** 6)
                 state_obj.balance=value
                 state_obj.flush()
+                if state_obj.is_update:
+                    update_count = update_count+ 1
                 
             else:
                 logger.error(parsed.message)
 
+    return update_count
 
 # 特定代币的交易记录：https://apilist.tronscan.org/api/token_trc20/transfers?limit=20&start=0&sort=-timestamp&count=true&tokens=TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t&relatedAddress=TD2jixXEuoFTc8LZ26TpN9eJYiG75Staaa
 def check_trx_address_status():
@@ -54,6 +67,8 @@ def check_trx_address_status():
     now = timezone.now()
     # 获取波场链下所有代币
     token_objs = Token.objects.filter(chain__chain_symbol="TRX")
+
+    update_count = 0
     for token_obj in token_objs:
         # 寻找符合对应公链地址的待检测对象
         state_objs = State.objects.filter(
@@ -81,3 +96,9 @@ def check_trx_address_status():
                     value:Decimal = Decimal(data['quantity'])
                     state_obj.balance=value
                     state_obj.flush()
+
+                    if state_obj.is_update:
+                        update_count = update_count+ 1
+
+
+    return update_count
