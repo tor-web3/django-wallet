@@ -61,7 +61,6 @@ def check_trx_address_deposit():
             try:
                 request_url = f"{host_url}?limit=100&start=0&sort=-timestamp&count=true" \
                     f"&tokens={token.contract_address}&relatedAddress={state.address}&toAddress={state.address}"
-                print(request_url)
                 response = requests.get(request_url).json()
                 token_transfer_list = response['token_transfers']
             except Exception as e:
