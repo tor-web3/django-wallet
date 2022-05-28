@@ -27,7 +27,7 @@ class RPC(CreateUpdateTracker):
 
 class StateManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return super().get_queryset().filter(is_active=True).order_by('updated_at')
 
 class State(CreateUpdateTracker):
     
@@ -37,7 +37,7 @@ class State(CreateUpdateTracker):
         
     objects = StateManager()
 
-    address = models.ForeignKey(Address, related_name="wallet_chainstate_state",on_delete=models.CASCADE)
+    address = models.OneToOneField(Address, related_name="wallet_chainstate_state",on_delete=models.CASCADE)
     usdt_balance = models.DecimalField(
         verbose_name=_('usdt balance'),
         max_digits=32,decimal_places=8,
@@ -81,8 +81,14 @@ class State(CreateUpdateTracker):
 
     def flush(self):
         self.query_count = self.query_count + 1
-        update_fields = self.update_fields + ['query_count']
-        
+        update_fields.append('query_count')
+
+        from django.utils import timezone
+        now = timezone.now()
+        if self.stop_at < now:
+            self.is_active = False
+            update_fields.append('is_active')
+            
         fields = list(set(update_fields))
         self.save(update_fields=fields)
         if self.is_update:
