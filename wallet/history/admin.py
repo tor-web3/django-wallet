@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from wallet.history.models import Deposit
+from wallet.history.models import Deposit,Deposited
 
 class DepositAdmin(admin.ModelAdmin):
 
@@ -13,4 +13,6 @@ class DepositAdmin(admin.ModelAdmin):
     )
     list_filter = ("deposit__user","token__chain")
 
+
 admin.site.register(Deposit,DepositAdmin)
+admin.site.register(Deposited,DepositAdmin)

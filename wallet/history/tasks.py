@@ -37,10 +37,12 @@ def check_eth_address_deposit():
 def check_trx_address_deposit():
     update_count = 0
     
+    # 获取所有代币
     tokens = Token.objects.filter(
         chain__chain_symbol = "TRX"
     )
 
+    # 获取所有更新地址
     state_objs = State.objects.filter(
         rpc__chain__chain_symbol='TRX',is_update=True
     )[:20]
@@ -49,10 +51,14 @@ def check_trx_address_deposit():
 
     for token in tokens:
         for state in state_objs:
-            request_url = f"{host_url}?limit=20&start=0&sort=-timestamp&count=true" \
-                f"&tokens={token.contract_address}&relatedAddress={state.address}"
-            response = requests.get(request_url).json()
-            token_transfer_list = response['token_transfers']
+            try:
+                request_url = f"{host_url}?limit=20&start=0&sort=-timestamp&count=true" \
+                    f"&tokens={token.contract_address}&relatedAddress={state.address}"
+                response = requests.get(request_url).json()
+                token_transfer_list = response['token_transfers']
+            except Exception as e:
+                logger.error(f"请求{request_url}时网络或参数发生错误",exc_info=e.args)
+                break
 
             try:
                 for transfer in token_transfer_list:
@@ -60,15 +66,18 @@ def check_trx_address_deposit():
                         # 忽略非充值类交易
                         continue
 
-                    if transfer['contractRet'] != 'SUCCESS' or transfer['finalResult'] != 'SUCCESS':
+                    if transfer['contractRet'] != 'SUCCESS' \
+                        or transfer['finalResult'] != 'SUCCESS':
+                        # 忽略异常交易
                         logger.warning(f"发生一笔未知的错误交易:{transfer['transaction_id']}")
                         continue
 
                     if transfer['fromAddressIsContract']:
+                        # 忽略合约充值
                         logger.warning(f"发生了一笔合约转入:{transfer['transaction_id']}")
                         continue
                     
-                    timestamp = transfer['block_ts']/ 1000
+                    timestamp = transfer['block_ts'] / 1000
                     
                     deposit = Deposit()
                     deposit.txid                    = transfer['transaction_id']
@@ -79,9 +88,14 @@ def check_trx_address_deposit():
                     deposit.token                   = token if token.contract_address == transfer['contract_address'] else None
                     deposit.block_time              = timezone.datetime.fromtimestamp(timestamp,timezone.utc)
                     deposit.save()
+                    update_count = update_count + 1
             except IntegrityError as e:
                 # TXID已经存在
-                logger.debug(f"{state.address} 无更新的交易")
+                state.is_active = False
+                state.is_update = False
+                state.save(update_fields=['is_active','is_update'])
+
+                logger.debug(f"{state.address} 无更新的交易",exc_info=e.args)
                 
 
     return update_count
