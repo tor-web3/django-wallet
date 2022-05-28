@@ -10,7 +10,7 @@ from wallet.chainstate.models import State,RPC
 from logging import getLogger
 logger = getLogger(__name__)
 
-@receiver(post_save, sender=Address)
+
 def handle_post_save_address(sender, instance:Address, created:bool, **kwargs):
     """主动发现处于活跃的地址
 
