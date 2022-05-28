@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'wallet',
     'wallet.chainstate',
+    'wallet.history',
 ]
 
 MIDDLEWARE = [
