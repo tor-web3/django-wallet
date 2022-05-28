@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from wallet.history.models import Deposit,Deposited
+from wallet.history.models import Deposit
 
 class DepositAdmin(admin.ModelAdmin):
 
@@ -15,4 +15,3 @@ class DepositAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Deposit,DepositAdmin)
-admin.site.register(Deposited,DepositAdmin)

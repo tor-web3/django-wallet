@@ -60,18 +60,11 @@ class Deposit(models.Model):
 
 
     class Meta:
-        ordering = ["-created_time"]
+        ordering = ["-block_time"]
         
-        verbose_name = _('Temp Deposit')
-        verbose_name_plural = _('Temp Deposit')
+        verbose_name = _('Deposit')
+        verbose_name_plural = _('Deposit')
 
-
-class Deposited(Deposit):
-    
-    class Meta:
-        ordering = ["-created_time"]
-        verbose_name = _('Deposited')
-        verbose_name_plural = _('Deposited')
 
 
 class Withdraw(models.Model):

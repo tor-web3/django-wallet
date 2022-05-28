@@ -10,7 +10,7 @@ from django.db.utils import IntegrityError
 
 from wallet.models import Token
 from wallet.chainstate.models import State
-
+from wallet.history import constant
 from wallet.history.models import Deposit
 
 def check_address_deposit(chain:str=None):
@@ -35,6 +35,9 @@ def check_eth_address_deposit():
     return update_count
 
 def check_trx_address_deposit():
+    """
+    检查波场充值情况
+    """
     update_count = 0
     
     # 获取所有代币
@@ -48,12 +51,17 @@ def check_trx_address_deposit():
     )[:20]
 
     host_url = "https://apilist.tronscan.org/api/token_trc20/transfers"
-
+    # https://apilist.tronscan.org/api/token_trc20/transfers?
+    # limit=20&start=0&sort=-timestamp&count=true&
+    # toAddress=TQ3UsrgH4nCyjxze6tqTZoCax54WVmmRkS&
+    # tokens=TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t&
+    # relatedAddress=TQ3UsrgH4nCyjxze6tqTZoCax54WVmmRkS
     for token in tokens:
         for state in state_objs:
             try:
-                request_url = f"{host_url}?limit=20&start=0&sort=-timestamp&count=true" \
-                    f"&tokens={token.contract_address}&relatedAddress={state.address}"
+                request_url = f"{host_url}?limit=100&start=0&sort=-timestamp&count=true" \
+                    f"&tokens={token.contract_address}&relatedAddress={state.address}&toAddress={state.address}"
+                print(request_url)
                 response = requests.get(request_url).json()
                 token_transfer_list = response['token_transfers']
             except Exception as e:
@@ -91,11 +99,40 @@ def check_trx_address_deposit():
                     update_count = update_count + 1
             except IntegrityError as e:
                 # TXID已经存在
-                state.is_active = False
                 state.is_update = False
                 state.save(update_fields=['is_active','is_update'])
 
                 logger.debug(f"{state.address} 无更新的交易",exc_info=e.args)
                 
+
+    return update_count
+
+
+def check_trx_deposit_hsitory():
+    """
+    检查交易是否真实
+    """
+    update_count = 0
+    history = Deposit.objects.filter(
+        status=constant.SUBMITTED,
+        token__chain__chain_symbol = "TRX"
+    )[:20]
+
+    for order in history:
+        try:
+            host_url = 'https://api.trongrid.io/event/transaction'
+            request_url = f"{host_url}/{order.txid}"
+            response = requests.get(request_url).json()[0]
+            if response['event'] == 'Transfer(address indexed from, address indexed to, uint256 value)' \
+                and response['contract_address'] == order.token.contract_address:
+                
+                order.status = constant.AUDITED
+                
+                order.save(update_fields=['status'])
+                update_count = update_count + 1
+        except Exception as e:
+            logger.error(f"未知错误:{request_url}",exc_info=e.args)
+            order.status = constant.ERROR
+            order.save(update_fields=['status'])
 
     return update_count

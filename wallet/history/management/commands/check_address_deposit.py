@@ -16,11 +16,14 @@ class Command(BaseCommand):
                             help='check wallet address deposit history based on blockchain.(default: ALL)')
 
     def handle(self, *args, **options):
-        from wallet.history.tasks import check_address_deposit
+        from wallet.history.tasks import check_address_deposit,check_trx_deposit_hsitory
 
         chain = options['chain'] if options['chain'] else None
-
+        
         updated_count = check_address_deposit(chain)
+        print(f"There are {updated_count} wallet addresses deposit behavior.")
+
+        updated_count = check_trx_deposit_hsitory()
         print(f"There are {updated_count} wallet addresses deposit behavior.")
     
 
