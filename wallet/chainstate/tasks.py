@@ -5,7 +5,6 @@ from jsonrpcclient import parse,Ok
 from logging import getLogger
 logger = getLogger(__name__)
 
-from django.utils import timezone
 
 from wallet.models import Token
 from wallet.chainstate.models import State
@@ -25,14 +24,12 @@ def check_eth_address_status():
     """
     检测以太坊地址的余额状态
     """
-    now = timezone.now()
     token_objs = Token.objects.filter(chain__chain_symbol="ETH")
     
     update_count = 0
     for token_obj in token_objs:
         state_objs = State.objects.filter(
             rpc__chain=token_obj.chain,is_update=False,
-            stop_at__gt=now,
         )[:20]
         for state_obj in state_objs:
             addr_obj = state_obj.address
@@ -98,7 +95,6 @@ def check_trx_address_status():
                     state_obj.flush()
 
                     if state_obj.is_update:
-                        update_count = update_count+ 1
-
+                        update_count = update_count + 1
 
     return update_count
