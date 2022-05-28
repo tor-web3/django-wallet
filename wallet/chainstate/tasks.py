@@ -61,7 +61,6 @@ def check_trx_address_status():
     """
     检测波场地址的余额状态
     """
-    now = timezone.now()
     # 获取波场链下所有代币
     token_objs = Token.objects.filter(chain__chain_symbol="TRX")
 
@@ -70,7 +69,6 @@ def check_trx_address_status():
         # 寻找符合对应公链地址的待检测对象
         state_objs = State.objects.filter(
             rpc__chain=token_obj.chain,is_update=False,
-            stop_at__gt=now,
         )[:20]
         for state_obj in state_objs:
             addr_obj = state_obj.address

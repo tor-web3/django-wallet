@@ -81,15 +81,17 @@ class State(CreateUpdateTracker):
 
     def flush(self):
         self.query_count = self.query_count + 1
-        update_fields.append('query_count')
+        self.update_fields.append('query_count')
 
+        # 检查地址是否仍然活跃
         from django.utils import timezone
         now = timezone.now()
         if self.stop_at < now:
             self.is_active = False
-            update_fields.append('is_active')
-            
-        fields = list(set(update_fields))
+            self.update_fields.append('is_active')
+        
+        # 更新地址信息
+        fields = list(set(self.update_fields))
         self.save(update_fields=fields)
         if self.is_update:
             wallet_address_updated.send(
