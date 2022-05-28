@@ -1,17 +1,12 @@
-
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
 from django.utils import timezone
 
-
-from wallet.models import Address
 from wallet.chainstate.models import State,RPC
 
 from logging import getLogger
 logger = getLogger(__name__)
 
 
-def handle_post_save_address(sender, instance:Address, created:bool, **kwargs):
+def handle_post_save_address(sender, instance:'Address', created:bool, **kwargs):
     """主动发现处于活跃的地址
 
     Args:
