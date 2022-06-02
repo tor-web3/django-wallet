@@ -16,5 +16,15 @@ python manage.py loaddata wallet.json
 python manage.py create_deposit_address -u [username or uid]
 ```
 
-# 其他项目依赖
-jsonrpcclient
+
+# 检测充值情况
+
+```
+# 创建钱包地址
+python manage.py create_deposit_address -u [username or uid]
+# 检测地址是否发生余额变动
+python manage.py check_address_status -c [eth or trx]
+# 检测地址是否发生充值记录
+python manage.py check_address_deposit -c [eth or trx]
+```
+

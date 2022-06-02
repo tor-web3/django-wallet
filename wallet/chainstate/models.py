@@ -27,17 +27,17 @@ class RPC(CreateUpdateTracker):
 
 class StateManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return super().get_queryset().filter(is_active=True).order_by('updated_at')
 
 class State(CreateUpdateTracker):
     
     def __init__(self,*args,**kwargs):
-        self.update_fileds = []
+        self.update_fields = []
         super(State,self).__init__(*args,**kwargs)
         
     objects = StateManager()
 
-    address = models.ForeignKey(Address, related_name="wallet_chainstate_state",on_delete=models.CASCADE)
+    address = models.OneToOneField(Address, related_name="wallet_chainstate_state",on_delete=models.CASCADE)
     usdt_balance = models.DecimalField(
         verbose_name=_('usdt balance'),
         max_digits=32,decimal_places=8,
@@ -62,7 +62,10 @@ class State(CreateUpdateTracker):
         )
     )
     query_count = models.IntegerField(verbose_name=_('query count'),default=0)
-    rpc = models.ForeignKey(RPC, related_name="wallet_chainstate_state", on_delete=models.CASCADE)
+    rpc = models.ForeignKey(
+        RPC, related_name="wallet_chainstate_state", 
+        on_delete=models.CASCADE, null=True
+    )
 
     @property
     def balance(self):
@@ -72,15 +75,24 @@ class State(CreateUpdateTracker):
         if self.usdt_balance != value:
             self.usdt_balance = value
             self.is_update = True
-            self.update_fileds = ['usdt_balance','is_update']
+            self.update_fields = ['usdt_balance','is_update']
             return self.usdt_balance
         return None
 
     def flush(self):
         self.query_count = self.query_count + 1
-        update_fileds = self.update_fileds + ['query_count']
+        self.update_fields.append('query_count')
+
+        # 检查地址是否仍然活跃
+        from django.utils import timezone
+        now = timezone.now()
+        if self.stop_at < now:
+            self.is_active = False
+            self.update_fields.append('is_active')
         
-        self.save(update_fileds=list(set(update_fileds)))
+        # 更新地址信息
+        fields = list(set(self.update_fields))
+        self.save(update_fields=fields)
         if self.is_update:
             wallet_address_updated.send(
                 sender=self.__class__,

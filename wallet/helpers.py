@@ -60,7 +60,11 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
         
         # 若已经存在该地址则返回，没有则创建
         try:
-            return Address.objects.get(user=user,chain__chain_symbol=chain_symbol,index=index)
+            address = Address.objects.get(user=user,chain__chain_symbol=chain_symbol,index=index)
+            from wallet.chainstate.models import State
+            address.wallet_chainstate_state.is_active = True
+            address.wallet_chainstate_state.save(update_fields=['is_active'])
+            return address
         except Address.DoesNotExist as e:
             # 创建钱包地址
             hdwallet: HDWallet = HDWallet(symbol=chain_symbol, use_default_path=False)
