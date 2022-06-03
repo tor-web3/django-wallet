@@ -79,6 +79,14 @@ class State(CreateUpdateTracker):
             return self.usdt_balance
         return None
 
+    def active(self):
+        from django.utils import timezone        
+        now = timezone.now()
+        self.stop_at = now + timezone.timedelta(hours=24,minutes=0,seconds=0)
+        self.is_active = True
+        self.save(update_fields=['stop_at','is_active'])
+        
+
     def flush(self):
         self.query_count = self.query_count + 1
         self.update_fields.append('query_count')
