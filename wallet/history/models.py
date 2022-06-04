@@ -54,8 +54,9 @@ class Deposit(models.Model):
                                          null=True,blank=True,default=None)
 
     def save(self,*args,**kargs):
-        from uuid import uuid4
-        self.uuid = uuid4()
+        if self.uuid is None:
+            from uuid import uuid4
+            self.uuid = uuid4()
         super().save(*args,**kargs)
 
 
