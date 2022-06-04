@@ -59,6 +59,15 @@ class Deposit(models.Model):
             self.uuid = uuid4()
         super().save(*args,**kargs)
 
+        from wallet.history.signals import wallet_address_deposit
+        wallet_address_deposit.send(
+                sender=self.__class__,
+                instance = self,
+                amount = self.amount,
+                token_symbol = self.token.token_symbol,
+                user = self.deposit.user
+            )
+
 
     class Meta:
         ordering = ["-block_time"]
