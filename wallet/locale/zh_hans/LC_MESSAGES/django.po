@@ -20,7 +20,7 @@ msgstr ""
 
 #: .\constant.py:7
 msgid "deposit"
-msgstr ""
+msgstr "充值"
 
 #: .\constant.py:8
 msgid "system lease"
@@ -28,23 +28,23 @@ msgstr ""
 
 #: .\models.py:9
 msgid "Chain Name"
-msgstr ""
+msgstr "链名称"
 
 #: .\models.py:10
 msgid "Chain Network"
-msgstr ""
+msgstr "区块链网络"
 
 #: .\models.py:11
 msgid "Chain Token Symbol"
-msgstr ""
+msgstr "链单位"
 
 #: .\models.py:13 .\models.py:31 .\models.py:59 .\models.py:98
 msgid "Created Time"
-msgstr ""
+msgstr "创建时间"
 
 #: .\models.py:14 .\models.py:60
 msgid "Updated Time"
-msgstr ""
+msgstr "更新时间"
 
 #: .\models.py:16
 msgid "Explorer URL"
@@ -52,15 +52,15 @@ msgstr "区块链浏览器"
 
 #: .\models.py:22 .\models.py:23
 msgid "chain"
-msgstr ""
+msgstr "链"
 
 #: .\models.py:26 .\models.py:73
 msgid "User ID"
-msgstr ""
+msgstr "用户编号"
 
 #: .\models.py:27
 msgid "Account Extended Public Key"
-msgstr ""
+msgstr "账户外部公钥"
 
 #: .\models.py:37 .\models.py:38
 msgid "public key"
@@ -80,11 +80,11 @@ msgstr "代币名称"
 
 #: .\models.py:49
 msgid "Token Decimal"
-msgstr ""
+msgstr "代币精度"
 
 #: .\models.py:52 .\models.py:91
 msgid "Active"
-msgstr ""
+msgstr "激活"
 
 #: .\models.py:55 .\models.py:94
 msgid ""
@@ -94,31 +94,31 @@ msgstr ""
 
 #: .\models.py:66
 msgid "Token"
-msgstr ""
+msgstr "代币"
 
 #: .\models.py:67
 msgid "Tokens"
-msgstr ""
+msgstr "代币列表"
 
 #: .\models.py:75
 msgid "Public Key"
-msgstr ""
+msgstr "公钥"
 
 #: .\models.py:80
 msgid "Label"
-msgstr ""
+msgstr "标签"
 
 #: .\models.py:81
 msgid "Label/Tag/Memo"
-msgstr ""
+msgstr "标签/备注"
 
 #: .\models.py:82
 msgid "Inedx"
-msgstr ""
+msgstr "下标"
 
 #: .\models.py:84 .\models.py:104
 msgid "address"
-msgstr ""
+msgstr "地址"
 
 #: .\models.py:85
 msgid "Temporary discontinuation of service"
@@ -126,8 +126,8 @@ msgstr ""
 
 #: .\models.py:87
 msgid "Address Type"
-msgstr ""
+msgstr "地址类型"
 
 #: .\models.py:105
 msgid "addresses"
-msgstr ""
+msgstr "地址列表"
