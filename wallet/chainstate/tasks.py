@@ -10,7 +10,9 @@ from wallet.models import Token
 from wallet.chainstate.models import State
 from wallet.chainstate.utils import request_token_balance
 
+from test_app.celery import app
 
+@app.task(ignore_result=True)
 def check_address_status(chain:str=None):
     updated_count = 0
     if chain is None or chain.upper() == 'ETH':
@@ -47,12 +49,12 @@ def check_eth_address_status():
                 from decimal import Decimal
                 value:Decimal = Decimal(int(parsed.result,16)) / (10 ** 6)
                 state_obj.balance=value
-                state_obj.flush()
                 if state_obj.is_update:
                     update_count = update_count+ 1
-                
             else:
                 logger.error(parsed.message)
+                
+            state_obj.flush()
 
     return update_count
 
@@ -90,9 +92,8 @@ def check_trx_address_status():
                     from decimal import Decimal
                     value:Decimal = Decimal(data['quantity'])
                     state_obj.balance=value
-                    state_obj.flush()
 
                     if state_obj.is_update:
                         update_count = update_count + 1
-
+            state_obj.flush()
     return update_count

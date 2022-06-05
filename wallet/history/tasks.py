@@ -13,6 +13,10 @@ from wallet.chainstate.models import State
 from wallet.history import constant
 from wallet.history.models import Deposit
 
+from django.conf import settings
+from test_app.celery import app
+
+@app.task(ignore_result=True)
 def check_address_deposit(chain:str=None):
     updated_count = 0
     if chain is None or chain.upper() == 'ETH':
