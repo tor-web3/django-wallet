@@ -1,4 +1,5 @@
 import requests
+from decimal import Decimal
 from typing import Union, List, Optional, Dict
 from jsonrpcclient import parse,Ok
 
@@ -46,7 +47,6 @@ def check_eth_address_status():
                     
             parsed = parse(response.json())
             if isinstance(parsed, Ok):
-                from decimal import Decimal
                 value:Decimal = Decimal(int(parsed.result,16)) / (10 ** 6)
                 state_obj.balance=value
                 if state_obj.is_update:
@@ -57,6 +57,27 @@ def check_eth_address_status():
             state_obj.flush()
 
     return update_count
+def get_eth_address_balance(addr_obj:'Address', token_obj:'Token'):
+    pass
+
+def get_trx_address_balance(addr_obj:'Address', token_obj:'Token'):
+    # 构建地址代币余额请求接口
+    host_url = "https://apilist.tronscan.org/api/account/tokens"
+    token_info_url = f"{host_url}?address={addr_obj.address}&token={token_obj.token_symbol}"
+                    #&start=0&limit=20&hidden=0&show=0&sortType=0"
+
+    # 检测代币值变化
+    response = requests.get(
+        token_info_url
+    )
+    parsed_data = response.json()['data']
+
+    # 寻找当前检测代币合约地址的对象
+    for data in parsed_data:
+        if token_obj.contract_address == data['tokenId']:
+            value:Decimal = Decimal(data['quantity'])
+            return value
+    return None
 
 # 特定代币的交易记录：https://apilist.tronscan.org/api/token_trc20/transfers?limit=20&start=0&sort=-timestamp&count=true&tokens=TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t&relatedAddress=TD2jixXEuoFTc8LZ26TpN9eJYiG75Staaa
 def check_trx_address_status():
@@ -75,25 +96,12 @@ def check_trx_address_status():
         for state_obj in state_objs:
             addr_obj = state_obj.address
 
-            # 构建地址代币余额请求接口
-            host_url = "https://apilist.tronscan.org/api/account/tokens"
-            token_info_url = f"{host_url}?address={addr_obj.address}&token={token_obj.token_symbol}"
-                            #&start=0&limit=20&hidden=0&show=0&sortType=0"
-
-            # 检测代币值变化
-            response = requests.get(
-                token_info_url
+            state_obj.balance = get_trx_address_balance(
+                addr_obj=addr_obj,
+                token_obj=token_obj
             )
-            parsed_data = response.json()['data']
-
-            # 寻找当前检测代币合约地址的对象
-            for data in parsed_data:
-                if token_obj.contract_address == data['tokenId']:
-                    from decimal import Decimal
-                    value:Decimal = Decimal(data['quantity'])
-                    state_obj.balance=value
-
-                    if state_obj.is_update:
-                        update_count = update_count + 1
+    
+            if state_obj.is_update:
+                update_count = update_count + 1
             state_obj.flush()
     return update_count
