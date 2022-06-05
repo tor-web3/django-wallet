@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-10 00:05+0800\n"
+"POT-Creation-Date: 2022-06-05 20:13+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,116 +18,321 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: .\constant.py:7
+#: .\apps\django-wallet\wallet\apps.py:8
+msgid "Wallet"
+msgstr "钱包"
+
+#: .\apps\django-wallet\wallet\chainstate\apps.py:9
+msgid "Wallet State"
+msgstr "钱包状态"
+
+#: .\apps\django-wallet\wallet\chainstate\constant.py:6
+msgid "normal"
+msgstr "正常"
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:13
+msgid "company"
+msgstr "公司"
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:14
+msgid "alias"
+msgstr "别名"
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:15
+msgid "endpoint"
+msgstr ""
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:16
+msgid "username"
+msgstr "昵称"
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:17
+msgid "password"
+msgstr "密码"
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:18
+msgid "auth"
+msgstr ""
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:24
+#: .\apps\django-wallet\wallet\chainstate\models.py:25
+msgid "RPC"
+msgstr ""
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:42
+msgid "usdt balance"
+msgstr "USDT余额"
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:47
+msgid "Stop Time"
+msgstr "停止时间"
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:49
+msgid "When to stop the test"
+msgstr "停止测试的时候"
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:53
+#, fuzzy
+#| msgid "Active"
+msgid "active"
+msgstr "激活"
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:55
+msgid "Whether it is necessary to detect the operating status of the address"
+msgstr ""
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:59
+msgid "update"
+msgstr ""
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:61
+msgid "Status of address update"
+msgstr ""
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:64
+msgid "query count"
+msgstr "查询次数"
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:114
+msgid "State"
+msgstr "状态"
+
+#: .\apps\django-wallet\wallet\chainstate\models.py:115
+#: .\apps\django-wallet\wallet\history\models.py:41
+#: .\apps\django-wallet\wallet\history\models.py:108
+msgid "Status"
+msgstr "状态"
+
+#: .\apps\django-wallet\wallet\constant.py:7
 msgid "deposit"
 msgstr "充值"
 
-#: .\constant.py:8
+#: .\apps\django-wallet\wallet\constant.py:8
 msgid "system lease"
 msgstr ""
 
-#: .\models.py:9
-msgid "Chain Name"
-msgstr "链名称"
+#: .\apps\django-wallet\wallet\history\apps.py:8
+msgid "Wallet History"
+msgstr "钱包记录"
 
-#: .\models.py:10
-msgid "Chain Network"
-msgstr "区块链网络"
+#: .\apps\django-wallet\wallet\history\constant.py:11
+msgid "submitted"
+msgstr "已提交"
 
-#: .\models.py:11
-msgid "Chain Token Symbol"
-msgstr "链单位"
+#: .\apps\django-wallet\wallet\history\constant.py:12
+msgid "audited"
+msgstr "已审核"
 
-#: .\models.py:13 .\models.py:31 .\models.py:59 .\models.py:98
+#: .\apps\django-wallet\wallet\history\constant.py:13
+msgid "reject"
+msgstr "拒绝"
+
+#: .\apps\django-wallet\wallet\history\constant.py:14
+msgid "withdrawing"
+msgstr "提币中"
+
+#: .\apps\django-wallet\wallet\history\constant.py:15
+msgid "withdrawn"
+msgstr "已提币"
+
+#: .\apps\django-wallet\wallet\history\constant.py:16
+msgid "error"
+msgstr "错误"
+
+#: .\apps\django-wallet\wallet\history\constant.py:21
+msgid "Tor"
+msgstr ""
+
+#: .\apps\django-wallet\wallet\history\constant.py:22
+msgid "Huobi Global Limited"
+msgstr ""
+
+#: .\apps\django-wallet\wallet\history\constant.py:29
+msgid "Manual"
+msgstr ""
+
+#: .\apps\django-wallet\wallet\history\constant.py:30
+msgid "Robot"
+msgstr ""
+
+#: .\apps\django-wallet\wallet\history\models.py:12
+#: .\apps\django-wallet\wallet\history\models.py:81
+msgid "History UUID"
+msgstr ""
+
+#: .\apps\django-wallet\wallet\history\models.py:13
+#: .\apps\django-wallet\wallet\history\models.py:82
+msgid "TXID"
+msgstr ""
+
+#: .\apps\django-wallet\wallet\history\models.py:16
+#: .\apps\django-wallet\wallet\history\models.py:85
+msgid "Internal CounterParty ID"
+msgstr "内部对手编号"
+
+#: .\apps\django-wallet\wallet\history\models.py:21
+#: .\apps\django-wallet\wallet\history\models.py:90
+#, fuzzy
+#| msgid "Contract Address"
+msgid "CounterParty Address"
+msgstr "合约地址"
+
+#: .\apps\django-wallet\wallet\history\models.py:24
+#, fuzzy
+#| msgid "Contract Address"
+msgid "Deposit Address"
+msgstr "合约地址"
+
+#: .\apps\django-wallet\wallet\history\models.py:32
+#: .\apps\django-wallet\wallet\history\models.py:94
+msgid "Amount"
+msgstr "金额"
+
+#: .\apps\django-wallet\wallet\history\models.py:37
+#: .\apps\django-wallet\wallet\history\models.py:104
+msgid "Memo"
+msgstr "备注"
+
+#: .\apps\django-wallet\wallet\history\models.py:38
+#: .\apps\django-wallet\wallet\history\models.py:105
+#: .\apps\django-wallet\wallet\models.py:94
+msgid "Label/Tag/Memo"
+msgstr "标签/备注"
+
+#: .\apps\django-wallet\wallet\history\models.py:46
+#: .\apps\django-wallet\wallet\history\models.py:113
+msgid "Error Info"
+msgstr "错误信息"
+
+#: .\apps\django-wallet\wallet\history\models.py:49
+#: .\apps\django-wallet\wallet\history\models.py:116
+#: .\apps\django-wallet\wallet\models.py:11
 msgid "Created Time"
 msgstr "创建时间"
 
-#: .\models.py:14 .\models.py:60
+#: .\apps\django-wallet\wallet\history\models.py:50
+#: .\apps\django-wallet\wallet\history\models.py:117
+#: .\apps\django-wallet\wallet\models.py:18
 msgid "Updated Time"
 msgstr "更新时间"
 
-#: .\models.py:16
+#: .\apps\django-wallet\wallet\history\models.py:51
+#: .\apps\django-wallet\wallet\history\models.py:118
+msgid "Finished Time"
+msgstr "完成时间"
+
+#: .\apps\django-wallet\wallet\history\models.py:53
+#: .\apps\django-wallet\wallet\history\models.py:120
+msgid "Block Time"
+msgstr "区块时间"
+
+#: .\apps\django-wallet\wallet\history\models.py:75
+#: .\apps\django-wallet\wallet\history\models.py:76
+#, fuzzy
+#| msgid "deposit"
+msgid "Deposit"
+msgstr "充值"
+
+#: .\apps\django-wallet\wallet\history\models.py:99
+msgid "Fee"
+msgstr "手续费"
+
+#: .\apps\django-wallet\wallet\models.py:25
+msgid "Chain Name"
+msgstr "链名称"
+
+#: .\apps\django-wallet\wallet\models.py:26
+msgid "Chain Network"
+msgstr "区块链网络"
+
+#: .\apps\django-wallet\wallet\models.py:27
+msgid "Chain Token Symbol"
+msgstr "链单位"
+
+#: .\apps\django-wallet\wallet\models.py:29
 msgid "Explorer URL"
 msgstr "区块链浏览器"
 
-#: .\models.py:22 .\models.py:23
+#: .\apps\django-wallet\wallet\models.py:37
+#: .\apps\django-wallet\wallet\models.py:38
 msgid "chain"
 msgstr "链"
 
-#: .\models.py:26 .\models.py:73
+#: .\apps\django-wallet\wallet\models.py:42
+#: .\apps\django-wallet\wallet\models.py:86
 msgid "User ID"
 msgstr "用户编号"
 
-#: .\models.py:27
+#: .\apps\django-wallet\wallet\models.py:43
 msgid "Account Extended Public Key"
 msgstr "账户外部公钥"
 
-#: .\models.py:37 .\models.py:38
+#: .\apps\django-wallet\wallet\models.py:51
+#: .\apps\django-wallet\wallet\models.py:52
 msgid "public key"
 msgstr "公钥"
 
-#: .\models.py:45
+#: .\apps\django-wallet\wallet\models.py:60
 msgid "Contract Address"
 msgstr "合约地址"
 
-#: .\models.py:47
+#: .\apps\django-wallet\wallet\models.py:62
 msgid "Token Symbol"
 msgstr "代币单位"
 
-#: .\models.py:48
+#: .\apps\django-wallet\wallet\models.py:63
 msgid "Token Name"
 msgstr "代币名称"
 
-#: .\models.py:49
+#: .\apps\django-wallet\wallet\models.py:64
 msgid "Token Decimal"
 msgstr "代币精度"
 
-#: .\models.py:52 .\models.py:91
+#: .\apps\django-wallet\wallet\models.py:67
+#: .\apps\django-wallet\wallet\models.py:104
 msgid "Active"
 msgstr "激活"
 
-#: .\models.py:55 .\models.py:94
+#: .\apps\django-wallet\wallet\models.py:70
+#: .\apps\django-wallet\wallet\models.py:107
 msgid ""
 "Designates whether this address should be treated as active. Unselect this "
 "instead of deleting address."
 msgstr ""
 
-#: .\models.py:66
+#: .\apps\django-wallet\wallet\models.py:79
 msgid "Token"
 msgstr "代币"
 
-#: .\models.py:67
+#: .\apps\django-wallet\wallet\models.py:80
 msgid "Tokens"
 msgstr "代币列表"
 
-#: .\models.py:75
+#: .\apps\django-wallet\wallet\models.py:88
 msgid "Public Key"
 msgstr "公钥"
 
-#: .\models.py:80
+#: .\apps\django-wallet\wallet\models.py:93
 msgid "Label"
 msgstr "标签"
 
-#: .\models.py:81
-msgid "Label/Tag/Memo"
-msgstr "标签/备注"
-
-#: .\models.py:82
+#: .\apps\django-wallet\wallet\models.py:95
 msgid "Inedx"
 msgstr "下标"
 
-#: .\models.py:84 .\models.py:104
+#: .\apps\django-wallet\wallet\models.py:97
+#: .\apps\django-wallet\wallet\models.py:117
 msgid "address"
 msgstr "地址"
 
-#: .\models.py:85
+#: .\apps\django-wallet\wallet\models.py:98
 msgid "Temporary discontinuation of service"
 msgstr ""
 
-#: .\models.py:87
+#: .\apps\django-wallet\wallet\models.py:100
 msgid "Address Type"
 msgstr "地址类型"
 
-#: .\models.py:105
+#: .\apps\django-wallet\wallet\models.py:118
 msgid "addresses"
 msgstr "地址列表"
