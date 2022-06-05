@@ -72,7 +72,7 @@ class State(CreateUpdateTracker):
         return self.usdt_balance
     @balance.setter
     def balance(self,value:Decimal):
-        if self.usdt_balance != value:
+        if self.usdt_balance != value and value != None:
             self.usdt_balance = value
             self.is_update = True
             self.update_fields = ['usdt_balance','is_update']
