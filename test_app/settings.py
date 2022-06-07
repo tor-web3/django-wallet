@@ -125,3 +125,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/1'
+CELERY_RESULT_BACKEND = 'django_celery_results.backends:DatabaseBackend'
+CELERY_CACHE_BACKEND = 'django_celery_results.backends:CacheBackend'
+CELERY_CONCURRENCY = 1
+DJANGO_CELERY_RESULTS_TASK_ID_MAX_LENGTH=191
