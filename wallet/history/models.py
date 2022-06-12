@@ -6,6 +6,8 @@ from django.utils.translation import gettext_lazy as _
 from wallet.models import Token,Address
 from wallet.history import constant
 
+from logging import getLogger
+logger = getLogger(__name__)
 
 
 class Deposit(models.Model):
@@ -33,7 +35,7 @@ class Deposit(models.Model):
         decimal_places=8,
         max_digits=32,)
 
-    token = models.ForeignKey(Token,default=None,on_delete=models.CASCADE,editable=False)
+    token = models.ForeignKey(Token,default=None,on_delete=models.CASCADE)
     memo = models.CharField(verbose_name=_('Memo'),max_length=128,
                             null=True,blank=True,default="",help_text=_('Label/Tag/Memo'))
 
@@ -54,19 +56,30 @@ class Deposit(models.Model):
                                          null=True,blank=True,default=None)
 
     def save(self,*args,**kargs):
+        try:
+            if self.deposit_address:
+                self.deposit = Address.objects.get(address=self.deposit_address)
+        except Address.DoesNotExist as e:
+            logger.error(f"address[{self.deposit_address}] not found.",exc_info=e.args)
+            raise e
         if self.uuid is None:
             from uuid import uuid4
             self.uuid = uuid4()
+        adding = self._state.adding
         super().save(*args,**kargs)
 
-        from wallet.history.signals import wallet_address_deposit
-        wallet_address_deposit.send(
-                sender=self.__class__,
-                instance = self,
-                amount = self.amount,
-                token_symbol = self.token.token_symbol,
-                user = self.deposit.user
-            )
+        if adding:
+            from wallet.history.signals import wallet_address_deposit
+            wallet_address_deposit.send(
+                    sender=self.__class__,
+                    instance = self,
+                    from_address = self.counterparty_address,
+                    to_address = self.deposit_address,
+                    amount = self.amount,
+                    token_symbol = self.token.token_symbol,
+                    memo = self.memo,
+                    user = self.deposit.user
+                )
 
 
     class Meta:
