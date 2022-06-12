@@ -13,8 +13,13 @@ from wallet.chainstate.utils import request_token_balance
 
 from test_app.celery import app
 
-@app.task(ignore_result=True)
+@app.task()
 def check_address_status(chain:str=None):
+    """
+    检查所有 State 表下的钱包地址余额状态
+    若余额发生变化，则更新 is_update、usdt_balance、query_count字段
+    否则仅更新query_count字段
+    """
     updated_count = 0
     if chain is None or chain.upper() == 'ETH':
         updated_count = check_all_address_status('ETH')
@@ -57,7 +62,7 @@ def get_trx_address_balance(state_obj:'State', token_obj:'Token'):
     # 寻找当前检测代币合约地址的对象
     for data in parsed_data:
         if token_obj.contract_address == data['tokenId']:
-            value:Decimal = Decimal(data['quantity'])
+            value:Decimal = Decimal(data['quantity']).quantize(Decimal('0.000000'))
             return value
     return None
 
@@ -66,27 +71,32 @@ def check_all_address_status(chain = 'TRX'):
     """
     检测波场地址的余额状态
     """
+    chain_upper = chain.upper()
     get_address_balance = get_eth_address_balance
-    if 'TRX' == chain.upper():
+    if 'TRX' == chain_upper:
         get_address_balance = get_trx_address_balance
 
     # 获取波场链下所有代币
-    token_objs = Token.objects.filter(chain__chain_symbol="TRX")
+    token_objs = Token.objects.filter(chain__chain_symbol=chain_upper)
 
     update_count = 0
     for token_obj in token_objs:
         # 寻找符合对应公链地址的待检测对象
         state_objs = State.objects.filter(
+            is_active=True,
             rpc__chain=token_obj.chain,is_update=False,
         )[:20]
         for state_obj in state_objs:
-
-            state_obj.balance = get_address_balance(
-                state_obj=state_obj,
-                token_obj=token_obj
-            )
-    
-            if state_obj.is_update:
-                update_count = update_count + 1
-            state_obj.flush()
+            try:
+                state_obj.balance = get_address_balance(
+                    state_obj=state_obj,
+                    token_obj=token_obj
+                )
+        
+                if state_obj.is_update:
+                    update_count = update_count + 1
+                state_obj.flush()
+            except Exception as e:
+                logger.error(f"{state_obj.address} get balance error",exc_info=e.args)
+                raise e
     return update_count
