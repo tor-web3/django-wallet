@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
 # Create your models here.
@@ -27,7 +28,7 @@ class RPC(CreateUpdateTracker):
 
 class StateManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True).order_by('updated_at')
+        return super().get_queryset().filter(is_active=True)
 
 class State(CreateUpdateTracker):
     
@@ -80,7 +81,6 @@ class State(CreateUpdateTracker):
         return None
 
     def active(self):
-        from django.utils import timezone        
         now = timezone.now()
         self.stop_at = now + timezone.timedelta(hours=24,minutes=0,seconds=0)
         self.is_active = True
@@ -113,3 +113,4 @@ class State(CreateUpdateTracker):
     class Meta:
         verbose_name = _('State')
         verbose_name_plural = _('Status')
+        ordering = ["updated_at"]
