@@ -16,8 +16,13 @@ from wallet.history.models import Deposit
 from django.conf import settings
 from test_app.celery import app
 
-@app.task(ignore_result=True)
+@app.task()
 def check_address_deposit(chain:str=None):
+    """
+    检查State处于is_update=True的所有地址
+    尝试下载地址的交易,成功则自动新增Deposit实例数据
+    若地址尝试下载发现交易已经存在,则将is_update字段修改为False
+    """
     updated_count = 0
     if chain is None or chain.upper() == 'ETH':
         updated_count = check_eth_address_deposit()
@@ -40,7 +45,8 @@ def check_eth_address_deposit():
 
 def check_trx_address_deposit():
     """
-    检查波场充值情况
+    检查波场充值情况,只追查最近25笔充值
+    若用户连续充值高于此限额,则会漏充值记录
     """
     update_count = 0
     
@@ -63,7 +69,7 @@ def check_trx_address_deposit():
     for token in tokens:
         for state in state_objs:
             try:
-                request_url = f"{host_url}?limit=100&start=0&sort=-timestamp&count=true" \
+                request_url = f"{host_url}?limit=50&start=0&sort=-timestamp&count=true" \
                     f"&tokens={token.contract_address}&relatedAddress={state.address}&toAddress={state.address}"
                 response = requests.get(request_url).json()
                 token_transfer_list = response['token_transfers']
@@ -103,7 +109,7 @@ def check_trx_address_deposit():
             except IntegrityError as e:
                 # TXID已经存在
                 state.is_update = False
-                state.save(update_fields=['is_active','is_update'])
+                state.save(update_fields=['is_update'])
 
                 logger.debug(f"{state.address} 无更新的交易",exc_info=e.args)
                 
