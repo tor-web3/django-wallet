@@ -113,7 +113,7 @@ class Withdraw(models.Model):
         decimal_places=8,max_digits=32,
         default=0
     )
-    token = models.ForeignKey(Token,default=None,on_delete=models.CASCADE,editable=False)
+    token = models.ForeignKey(Token,default=None,on_delete=models.CASCADE)
     memo = models.CharField(verbose_name=_('Memo'),max_length=128,
                             null=True,blank=True,default="",help_text=_('Label/Tag/Memo'))
 
@@ -134,6 +134,6 @@ class Withdraw(models.Model):
                                          null=True,blank=True,default=None)
 
     def save(self,*args,**kargs):
-        from uuid import uuid5
-        self.uuid = uuid5(self.__class__)
+        from uuid import uuid4
+        self.uuid = uuid4()
         super().save(*args,**kargs)
