@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib import messages
+from django.utils.translation import gettext_lazy as _
 
 # Register your models here.
 from wallet.history.models import Deposit,Withdraw
@@ -26,16 +28,15 @@ class WithdrawAdmin(admin.ModelAdmin):
 
     def response_change(self, request, obj):
         if "allow" in request.POST:
-            
             matching_names_except_this = self.get_queryset(request).get(pk=obj.id)
             if matching_names_except_this.status != constant.SUBMITTED:
-                self.message_user(request, "The order is abnormal and cannot be reviewed")
+                self.message_user(request, _("The order is abnormal and cannot be reviewed"),messages.ERROR)
                 return HttpResponseRedirect(".")
 
             matching_names_except_this.status = constant.AUDITED
             matching_names_except_this.save(update_fields=["status"])
-            self.message_user(request, "Allow Withdraw")
-            return HttpResponseRedirect(".")
+            self.message_user(request, _("Allow Withdraw"),messages.SUCCESS)
+            return HttpResponseRedirect("..")
         return super().response_change(request, obj)
 
 
