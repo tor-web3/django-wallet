@@ -2,7 +2,7 @@ import config
 
 from hdwallet import HDWallet
 from hdwallet.utils import generate_mnemonic
-from hdwallet.symbols import TRX as SYMBOL
+from hdwallet.symbols import ETH as SYMBOL
 from typing import Optional
 
 import json
@@ -28,7 +28,8 @@ def test_generate_mnemonic():
     # Or derivation from index
 
     hdwallet.from_index(44, hardened=True)
-    hdwallet.from_index(195, hardened=True)
+    # hdwallet.from_index(195, hardened=True)
+    hdwallet.from_index(60, hardened=True)# eth
     hdwallet.from_index(0, hardened=True)
     hdwallet.from_index(0)
     hdwallet.from_index(0)
