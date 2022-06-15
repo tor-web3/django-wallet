@@ -17,7 +17,7 @@ class DepositAdmin(admin.ModelAdmin):
 
 class WithdrawAdmin(admin.ModelAdmin):
     list_display = (
-        "counterparty_address","amount","token","status",
+        "txid","counterparty_address","amount","token","status","updated_time"
     )
 
     readonly_fields = ("status",)
@@ -31,7 +31,7 @@ class WithdrawAdmin(admin.ModelAdmin):
             if matching_names_except_this.status != constant.SUBMITTED:
                 self.message_user(request, "The order is abnormal and cannot be reviewed")
                 return HttpResponseRedirect(".")
-                
+
             matching_names_except_this.status = constant.AUDITED
             matching_names_except_this.save(update_fields=["status"])
             self.message_user(request, "Allow Withdraw")
