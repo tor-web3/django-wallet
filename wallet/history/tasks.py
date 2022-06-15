@@ -11,7 +11,7 @@ from django.db.utils import IntegrityError
 from wallet.models import Token
 from wallet.chainstate.models import State
 from wallet.history import constant
-from wallet.history.models import Deposit
+from wallet.history.models import Deposit,Withdraw
 
 from django.conf import settings
 from test_app.celery import app
@@ -145,3 +145,38 @@ def check_trx_deposit_hsitory():
             order.save(update_fields=['status'])
 
     return update_count
+
+
+@app.task()
+def check_trx_withdraw():
+    # test
+    from wallet.history.helpers import transfer_trc20_tron
+    update_count = 0
+    history = Withdraw.objects.filter(
+        status=constant.AUDITED,
+        token__chain__chain_symbol = "TRX"
+    )[:20]
+
+    for order in history:
+        try:
+            logger.error(
+                f"transfer {order.counterparty_address}[{order.amount}] {order.token.chain.chain_network}[{order.token.contract_address}]"
+            )
+            result = transfer_trc20_tron(
+                order.counterparty_address, 
+                int(order.amount),
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", 
+                order.token.contract_address, 
+                order.token.chain.chain_network
+            )
+            order.txid = result['id']
+            order.block_time = timezone.datetime.fromtimestamp(int(result['blockTimeStamp']) / 1000,timezone.utc)
+            order.success_info = json.dumps(result)
+            order.status = constant.WITHDRAWING
+            order.save(update_fields=['txid','block_time','success_info','status'])
+        except Exception as e:
+            logger.error(f"未知错误:{e.args}")
+            order.status = constant.ERROR
+            order.save(update_fields=['status'])
+            continue
+

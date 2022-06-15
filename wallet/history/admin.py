@@ -17,7 +17,7 @@ class DepositAdmin(admin.ModelAdmin):
 
 class WithdrawAdmin(admin.ModelAdmin):
     list_display = (
-        "counterparty_address","amount","token",
+        "counterparty_address","amount","token","status",
     )
 
     readonly_fields = ("status",)

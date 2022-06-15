@@ -125,6 +125,10 @@ class Withdraw(models.Model):
     )
     error_info = models.CharField(verbose_name=_("Error Info"),max_length=255,editable=False,
                                   null=True,blank=True,default="")
+    success_info = models.TextField(verbose_name=_("Success Info"),editable=False,
+                                  null=True,blank=True,default="")
+    request_info = models.TextField(verbose_name=_("Request Info"),editable=False,
+                                  null=True,blank=True,default="")
     
     created_time = models.DateTimeField(_("Created Time"), auto_now_add=True,editable=False)
     updated_time = models.DateTimeField(_("Updated Time"), auto_now=True,editable=False)
