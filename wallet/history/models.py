@@ -28,6 +28,7 @@ class Deposit(models.Model):
     deposit = models.ForeignKey(
         Address, related_name="wallet_history_deposit",
         on_delete=models.DO_NOTHING,
+        help_text=_("Owner of the order"),
         null=True,blank=True,default=None,editable=False
     )
 
@@ -91,6 +92,10 @@ class Deposit(models.Model):
 
 
 class Withdraw(models.Model):
+    user = models.ForeignKey(
+        get_user_model(),
+        verbose_name=_("User ID"),on_delete=models.CASCADE
+    )
     uuid = models.CharField(verbose_name=_("History UUID"),max_length=64,editable=False)
     txid = models.CharField(verbose_name=_('TXID'),max_length=256,editable=False,
                             null=True,default=None,blank=True, unique=True,)
