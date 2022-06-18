@@ -33,7 +33,7 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
             
             if not chain:
                 # 如果未获取到链信息
-                raise Chain.DoesNotExist(f"尚不支持{chain_symbol},请先添加.")
+                raise Chain.DoesNotExist(_(f"{chain_symbol} is not yet supported, please add it first."))
 
             hdwallet: HDWallet = HDWallet(symbol=chain_symbol, use_default_path=False)
             
