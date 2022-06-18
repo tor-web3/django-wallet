@@ -2,9 +2,10 @@ import requests,json
 from decimal import Decimal
 from typing import Union, List, Optional, Dict
 from jsonrpcclient import parse,Ok
-from logging import getLogger
-logger = getLogger(__name__)
 
+from requests.exceptions import SSLError
+
+from django.db import transaction
 from django.utils import timezone, datetime_safe as datetime
 from django.db.utils import IntegrityError
 
@@ -15,6 +16,8 @@ from wallet.history.models import Deposit,Withdraw
 
 from django.conf import settings
 from test_app.celery import app
+from celery.utils.log import get_task_logger as getLogger
+logger = getLogger(__name__)
 
 @app.task()
 def check_address_deposit(chain:str=None):
@@ -159,24 +162,36 @@ def check_trx_withdraw():
 
     for order in history:
         try:
-            logger.error(
-                f"transfer {order.counterparty_address}[{order.amount}] {order.token.chain.chain_network}[{order.token.contract_address}]"
-            )
-            result = transfer_trc20_tron(
-                order.counterparty_address, 
-                int(order.amount),
-                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", 
-                order.token.contract_address, 
-                order.token.chain.chain_network
-            )
-            order.txid = result['id']
-            order.block_time = timezone.datetime.fromtimestamp(int(result['blockTimeStamp']) / 1000,timezone.utc)
-            order.success_info = json.dumps(result)
-            order.status = constant.WITHDRAWING
-            order.save(update_fields=['txid','block_time','success_info','status'])
+            with transaction.atomic():
+                if order.status != Withdraw.objects.get(pk=order.pk).status:
+                    logger.warning("状态发生非预期的行为")
+                    continue
+                
+                order.status = constant.WITHDRAWING
+                order.save(update_fields=["status"])
+                
+                result = transfer_trc20_tron(
+                    order.counterparty_address, 
+                    int(order.amount),
+                    "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", 
+                    order.token.contract_address, 
+                    order.token.chain.chain_network
+                )
+                
+                order.txid = result['id']
+                order.block_time = timezone.datetime.fromtimestamp(int(result['blockTimeStamp']) / 1000,timezone.utc)
+                order.success_info = json.dumps(result)
+                order.save(
+                    update_fields=[
+                        'txid','block_time',
+                        'success_info'
+                    ]
+                )
         except Exception as e:
             logger.error(f"未知错误:{e.args}")
+            order.error_info = e.args
             order.status = constant.ERROR
-            order.save(update_fields=['status'])
+            order.save(update_fields=["error_info","status"])
             continue
-
+        except SSLError as e:
+            logger.error("网络连接错误")
