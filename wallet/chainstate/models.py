@@ -68,6 +68,14 @@ class State(CreateUpdateTracker):
         on_delete=models.CASCADE, null=True
     )
 
+    def __str__(self):
+        if not self.active:
+            return _("Inactivity")
+        if self.is_update:
+            return _("Updated")
+        return _("Active")
+    
+
     @property
     def balance(self):
         return self.usdt_balance
