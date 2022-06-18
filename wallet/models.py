@@ -63,6 +63,10 @@ class Token(CreateUpdateTracker):
     token_name = models.CharField(verbose_name=_("Token Name"), max_length=64, null=True)
     token_decimal = models.SmallIntegerField(verbose_name=_("Token Decimal"),default=6)
 
+    fee =  models.DecimalField(verbose_name=_("Fee"),
+        help_text=_("The handling fee is only used as a record and cannot be used as a calculation parameter"),
+        decimal_places=8, max_digits=32,default=0)
+
     is_active = models.BooleanField(
         _("Active"),
         default=True,
