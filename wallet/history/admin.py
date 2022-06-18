@@ -22,7 +22,7 @@ class WithdrawAdmin(admin.ModelAdmin):
         "txid","counterparty_address","amount","token","status","updated_time"
     )
 
-    readonly_fields = ("status",)
+    readonly_fields = ("status","txid")
 
     change_form_template = "admin/wallet/history/audit_withdraw.html"
 
