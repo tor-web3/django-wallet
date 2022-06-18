@@ -10,6 +10,7 @@ from django.utils import timezone, datetime_safe as datetime
 from django.db.utils import IntegrityError
 
 from wallet.models import Token
+from wallet.helpers import transfer_trc20_tron
 from wallet.chainstate.models import State
 from wallet.history import constant
 from wallet.history.models import Deposit,Withdraw
@@ -153,7 +154,6 @@ def check_trx_deposit_hsitory():
 @app.task()
 def check_trx_withdraw():
     # test
-    from wallet.history.helpers import transfer_trc20_tron
     update_count = 0
     history = Withdraw.objects.filter(
         status=constant.AUDITED,

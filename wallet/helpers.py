@@ -11,6 +11,10 @@ from wallet.constant import *
 from wallet.hdwallet import HDWallet
 from wallet import app_settings
 
+from tronpy import Tron, Contract
+from tronpy import AsyncTron, AsyncContract
+from tronpy.keys import PrivateKey
+
 from logging import getLogger
 logger = getLogger(__name__)
 
@@ -81,6 +85,40 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
     except Exception as e:
         logger.error(msg="Exception while generating wallet address:", exc_info=e)
 
+
+
+
+def transfer_trc20_tron(
+    to_address:str,value:int,private_key:str,
+    contract_address,
+    network
+):
+    priv_key = PrivateKey(bytes.fromhex(private_key))
+    from_address = priv_key.public_key.to_base58check_address()
+    client = Tron(network=network)
+    contract = client.get_contract(contract_address)
+    # print('Balance', contract.functions.balanceOf('TGQgfK497YXmjdgvun9Bg5Zu3xE15v17cu'))
+
+    txn = (
+        contract.functions.transfer(to_address, value)
+        .with_owner(from_address)
+        .fee_limit(5_000_000_000)
+        .build()
+        .sign(priv_key)
+        .inspect()
+        .broadcast()
+    )
+    
+    receipt = txn.wait()
+    return receipt
+
+def get_trc20_balance(address, contract_address, network="mainnet"):
+    client = Tron(network=network)
+    contract = client.get_contract(contract_address)
+    return contract.functions.balanceOf(address)
+
+
+# generate_eth_address = partial(transfer_trc20_tron, mainnet='ETH')
 
 generate_eth_address = partial(generate_address, chain_symbol='ETH')
 generate_trx_address = partial(generate_address, chain_symbol='TRX')
