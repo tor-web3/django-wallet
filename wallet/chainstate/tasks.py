@@ -3,8 +3,6 @@ from decimal import Decimal
 from typing import Union, List, Optional, Dict
 from jsonrpcclient import parse,Ok
 
-from logging import getLogger
-logger = getLogger(__name__)
 
 
 from wallet.models import Token
@@ -12,6 +10,8 @@ from wallet.chainstate.models import State
 from wallet.chainstate.utils import request_token_balance
 
 from test_app.celery import app
+from celery.utils.log import get_task_logger as getLogger
+logger = getLogger(__name__)
 
 @app.task()
 def check_address_status(chain:str=None):
