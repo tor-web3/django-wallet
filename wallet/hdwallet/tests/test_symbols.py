@@ -16,7 +16,10 @@ for path in INCLUDE_CODE_PATHS:
 
 print(sys.path)
 
-from hdwallet.symbols import *
+try:
+    from hdwallet.symbols import *
+except ImportError:
+    from wallet.hdwallet.symbols import *
 
 
 def test_symbols():

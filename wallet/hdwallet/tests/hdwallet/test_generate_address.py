@@ -1,8 +1,13 @@
-import config
+# import config
+try:
+    from hdwallet import HDWallet
+    from hdwallet.utils import generate_mnemonic
+    from hdwallet.symbols import ETH as SYMBOL
+except ImportError:
+    from wallet.hdwallet import HDWallet
+    from wallet.hdwallet.utils import generate_mnemonic
+    from wallet.hdwallet.symbols import ETH as SYMBOL
 
-from hdwallet import HDWallet
-from hdwallet.utils import generate_mnemonic
-from hdwallet.symbols import ETH as SYMBOL
 from typing import Optional
 
 import json
@@ -70,9 +75,9 @@ def write_value(values):
                             if address[8] == address[9]:
                                 with open(f'./address_{7}.csv', 'a+') as load_f :load_f.writelines(f'{values[0]},{values[1]}\n')
 
-for d in range(10000):
-    for i in range(10000):
-        values = test_generate_mnemonic()
-        write_value(values)
-    #     break
-    # break
+# for d in range(10000):
+#     for i in range(10000):
+#         values = test_generate_mnemonic()
+#         write_value(values)
+#     #     break
+#     # break

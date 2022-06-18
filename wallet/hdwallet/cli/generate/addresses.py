@@ -2,17 +2,30 @@
 
 from typing import Optional
 
-from hdwallet import HDWallet
-from hdwallet.derivations import (
-    Derivation, BIP32Derivation
-)
-from hdwallet.cryptocurrencies import (
-    Cryptocurrency, get_cryptocurrency
-)
-from hdwallet.utils import generate_mnemonic
-from hdwallet.cli import (
-    click, sys
-)
+try:
+    from hdwallet import HDWallet
+    from hdwallet.derivations import (
+        Derivation, BIP32Derivation
+    )
+    from hdwallet.cryptocurrencies import (
+        Cryptocurrency, get_cryptocurrency
+    )
+    from hdwallet.utils import generate_mnemonic
+    from hdwallet.cli import (
+        click, sys
+    )
+except ImportError:
+    from wallet.hdwallet import HDWallet
+    from wallet.hdwallet.derivations import (
+        Derivation, BIP32Derivation
+    )
+    from wallet.hdwallet.cryptocurrencies import (
+        Cryptocurrency, get_cryptocurrency
+    )
+    from wallet.hdwallet.utils import generate_mnemonic
+    from wallet.hdwallet.cli import (
+        click, sys
+    )
 
 
 def generate_addresses(

@@ -4,8 +4,13 @@ from tabulate import tabulate
 
 import inspect
 
-from hdwallet import cryptocurrencies
-from hdwallet.cli import click
+try:
+    from hdwallet import cryptocurrencies
+    from hdwallet.cli import click
+except ImportError:
+    from wallet.hdwallet import cryptocurrencies
+    from wallet.hdwallet.cli import click
+
 
 
 def list_cryptocurrencies():

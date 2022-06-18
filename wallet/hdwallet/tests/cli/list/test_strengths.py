@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
-
-from hdwallet.cli.__main__ import main as cli_main
+try:
+    from hdwallet.cli.__main__ import main as cli_main
+except ImportError:
+    from wallet.hdwallet.cli.__main__ import main as cli_main
 
 
 def test_strengths(cli_tester):

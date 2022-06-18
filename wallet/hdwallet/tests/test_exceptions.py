@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 
-from hdwallet.exceptions import (
-    NetworkError, DerivationError, SemanticError, AddressError, SymbolError
-)
+try:
+    from hdwallet.exceptions import (
+        NetworkError, DerivationError, SemanticError, AddressError, SymbolError
+    )
+except ImportError:
+    from wallet.hdwallet.exceptions import (
+        NetworkError, DerivationError, SemanticError, AddressError, SymbolError
+    )
 
 import pytest
 

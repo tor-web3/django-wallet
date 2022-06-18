@@ -2,8 +2,10 @@
 
 import json
 import os
-import config
-from hdwallet import HDWallet
+try:
+    from hdwallet import HDWallet
+except ImportError:
+    from wallet.hdwallet import HDWallet
 
 # Test Values
 base_path: str = os.path.dirname(__file__)
@@ -75,10 +77,10 @@ def test_from_mnemonic():
     assert hdwallet.dumps() == dumps
 
 
-def test_from_mnemonic_self():
-    from hdwallet.utils import generate_entropy
+# def test_from_mnemonic_self():
+#     from hdwallet.utils import generate_entropy
     
-    ENTROPY: str = generate_entropy(strength=160)
-    print(ENTROPY)
+#     ENTROPY: str = generate_entropy(strength=160)
+#     print(ENTROPY)
 
-test_from_mnemonic_self()
+# test_from_mnemonic_self()

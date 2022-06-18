@@ -4,11 +4,18 @@ import json
 import unicodedata
 import os
 
-from hdwallet.utils import (
-    get_bytes, generate_mnemonic, generate_entropy, is_entropy, get_mnemonic_strength,
-    get_entropy_strength, is_mnemonic, get_mnemonic_language, entropy_to_mnemonic, mnemonic_to_entropy,
-    is_root_xprivate_key, is_root_xpublic_key, generate_passphrase
-)
+try:
+    from wallet.hdwallet.utils import (
+        get_bytes, generate_mnemonic, generate_entropy, is_entropy, get_mnemonic_strength,
+        get_entropy_strength, is_mnemonic, get_mnemonic_language, entropy_to_mnemonic, mnemonic_to_entropy,
+        is_root_xprivate_key, is_root_xpublic_key, generate_passphrase
+    )
+except ImportError:
+    from hdwallet.utils import (
+        get_bytes, generate_mnemonic, generate_entropy, is_entropy, get_mnemonic_strength,
+        get_entropy_strength, is_mnemonic, get_mnemonic_language, entropy_to_mnemonic, mnemonic_to_entropy,
+        is_root_xprivate_key, is_root_xpublic_key, generate_passphrase
+    )
 
 # Test Values
 base_path: str = os.path.dirname(__file__)

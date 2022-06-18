@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
-from hdwallet.cli.__main__ import main as cli_main
-from hdwallet import __version__
-
+try:
+    from hdwallet.cli.__main__ import main as cli_main
+    from hdwallet import __version__
+except ImportError:
+    from wallet.hdwallet.cli.__main__ import main as cli_main
+    from wallet.hdwallet import __version__
 
 def test_hdwallet_cli(cli_tester):
 

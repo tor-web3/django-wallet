@@ -2,11 +2,19 @@
 
 import pytest
 
-from hdwallet.cryptocurrencies import BitcoinMainnet
-from hdwallet.derivations import (
-    Derivation, BIP32Derivation, BIP44Derivation, BIP49Derivation, BIP84Derivation, BIP141Derivation
-)
-from hdwallet.exceptions import SemanticError
+try:
+    from hdwallet.cryptocurrencies import BitcoinMainnet
+    from hdwallet.derivations import (
+        Derivation, BIP32Derivation, BIP44Derivation, BIP49Derivation, BIP84Derivation, BIP141Derivation
+    )
+    from hdwallet.exceptions import SemanticError
+except ImportError:
+    from wallet.hdwallet.cryptocurrencies import BitcoinMainnet
+    from wallet.hdwallet.derivations import (
+        Derivation, BIP32Derivation, BIP44Derivation, BIP49Derivation, BIP84Derivation, BIP141Derivation
+    )
+    from wallet.hdwallet.exceptions import SemanticError
+
 
 
 def test_derivations():

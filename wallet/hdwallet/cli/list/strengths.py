@@ -2,7 +2,10 @@
 
 from tabulate import tabulate
 
-from hdwallet.cli import click
+try:
+    from hdwallet.cli import click
+except ImportError:
+    from wallet.hdwallet.cli import click
 
 
 def list_strengths():

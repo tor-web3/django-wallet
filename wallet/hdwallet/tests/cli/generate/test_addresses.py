@@ -3,7 +3,10 @@
 import json
 import os
 
-from hdwallet.cli.__main__ import main as cli_main
+try:
+    from hdwallet.cli.__main__ import main as cli_main
+except ImportError:
+    from wallet.hdwallet.cli.__main__ import main as cli_main
 
 # Test Values
 base_path = os.path.dirname(__file__)

@@ -3,13 +3,23 @@
 from click_aliases import ClickAliasedGroup
 from typing import Optional
 
-from hdwallet import __version__
-from hdwallet.cli.generate.hdwallet import generate_hdwallet
-from hdwallet.cli.generate.addresses import generate_addresses
-from hdwallet.cli.list.cryptocurrencies import list_cryptocurrencies
-from hdwallet.cli.list.languages import list_languages
-from hdwallet.cli.list.strengths import list_strengths
-from hdwallet.cli import click
+try:
+    from hdwallet import __version__
+    from hdwallet.cli.generate.hdwallet import generate_hdwallet
+    from hdwallet.cli.generate.addresses import generate_addresses
+    from hdwallet.cli.list.cryptocurrencies import list_cryptocurrencies
+    from hdwallet.cli.list.languages import list_languages
+    from hdwallet.cli.list.strengths import list_strengths
+    from hdwallet.cli import click
+except ImportError:
+    from wallet.hdwallet import __version__
+    from wallet.hdwallet.cli.generate.hdwallet import generate_hdwallet
+    from wallet.hdwallet.cli.generate.addresses import generate_addresses
+    from wallet.hdwallet.cli.list.cryptocurrencies import list_cryptocurrencies
+    from wallet.hdwallet.cli.list.languages import list_languages
+    from wallet.hdwallet.cli.list.strengths import list_strengths
+    from wallet.hdwallet.cli import click
+
 
 
 CONTEXT_SETTINGS = dict(

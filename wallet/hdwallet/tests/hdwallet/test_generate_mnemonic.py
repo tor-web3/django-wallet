@@ -1,8 +1,14 @@
-import config
+# import config
 
-from hdwallet import HDWallet
-from hdwallet.utils import generate_mnemonic
-from hdwallet.symbols import ETH as SYMBOL
+try:
+    from hdwallet import HDWallet
+    from hdwallet.utils import generate_mnemonic
+    from hdwallet.symbols import ETH as SYMBOL
+except ImportError:
+    from wallet.hdwallet import HDWallet
+    from wallet.hdwallet.utils import generate_mnemonic
+    from wallet.hdwallet.symbols import ETH as SYMBOL
+
 from typing import Optional
 
 import json
@@ -29,4 +35,4 @@ def test_generate_mnemonic(mnemonic):
     # print(json.dumps(hdwallet.dumps(), indent=4, ensure_ascii=False))
     return hdwallet.p2pkh_address(),hdwallet.private_key()
     
-print(test_generate_mnemonic("stumble ozone erosion spike argue advice ladder canoe swear theory follow velvet humble tone park"))
+# print(test_generate_mnemonic("stumble ozone erosion spike argue advice ladder canoe swear theory follow velvet humble tone park"))

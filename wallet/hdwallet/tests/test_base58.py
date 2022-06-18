@@ -11,9 +11,14 @@ from binascii import (
 
 import pytest
 
-from hdwallet.libs.base58 import (
-    check_encode, check_decode, decode, encode, string_to_int
-)
+try:
+    from hdwallet.libs.base58 import (
+        check_encode, check_decode, decode, encode, string_to_int
+    )
+except ImportError:
+    from wallet.hdwallet.libs.base58 import (
+        check_encode, check_decode, decode, encode, string_to_int
+    )
 
 
 RAW: str = "0488ade405d5bc481680000000b5b40efbdef2e0a2e8ee6fa9d371f951f93e3b1e3c1b50fb31f9ea36cfc7c88100b9d3f3" \
