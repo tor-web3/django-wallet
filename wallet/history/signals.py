@@ -11,3 +11,6 @@ from django.dispatch import Signal
 # memo = self.memo,
 # user = self.deposit.user
 wallet_address_deposit = Signal()
+
+# pre_withdraw = Signal()
+post_withdraw = Signal()

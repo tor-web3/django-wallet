@@ -6,6 +6,7 @@ from django.utils import timezone, datetime_safe as datetime
 # Create your models here.
 from wallet.models import Token,Address
 from wallet.history import constant
+from wallet.history.signals import post_withdraw
 
 from uuid import uuid4
 
@@ -14,7 +15,7 @@ logger = getLogger(__name__)
 
 
 class Deposit(models.Model):
-    uuid = models.CharField(verbose_name=_("History UUID"),max_length=64,editable=False)
+    uuid = models.CharField(verbose_name=_("History UUID"),max_length=64,editable=False,default=None)
     txid = models.CharField(verbose_name=_('TXID'),max_length=256,editable=False,
                             null=True,default=None,blank=True, unique=True,)
     counterparty = models.ForeignKey(
@@ -70,7 +71,6 @@ class Deposit(models.Model):
             logger.error(f"address[{self.deposit_address}] not found.",exc_info=e.args)
             raise e
         if self.uuid is None:
-            from uuid import uuid4
             self.uuid = uuid4()
         adding = self._state.adding
         super().save(*args,**kargs)
@@ -102,7 +102,7 @@ class Withdraw(models.Model):
         get_user_model(),
         verbose_name=_("User ID"),on_delete=models.CASCADE
     )
-    uuid = models.CharField(verbose_name=_("History UUID"),max_length=64,editable=False)
+    uuid = models.CharField(verbose_name=_("History UUID"),max_length=64,editable=False,default=None)
     txid = models.CharField(verbose_name=_('TXID'),max_length=256,editable=False,
                             null=True,default=None,blank=True, unique=True,)
     counterparty = models.ForeignKey(
@@ -153,9 +153,22 @@ class Withdraw(models.Model):
     
 
     def save(self,*args,**kargs):
-        self.uuid = uuid4()
+        if self.uuid is None:
+            self.uuid = uuid4().__str__()        
         super().save(*args,**kargs)
 
+        if self.txid and self.status == constant.WITHDRAWING:
+            post_withdraw.send(
+                sender      = self.__class__,
+                instance    = self,
+                txid        = self.txid,
+                to_address  = self.counterparty_address,
+                amount      = self.amount,
+                fee         = self.fee,
+                token_symbol= self.token.token_symbol,
+                memo        = self.memo,
+                user        = self.user
+            )
     
     def cancel(self):
         if self.status == constant.SUBMITTED:
