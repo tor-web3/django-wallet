@@ -80,6 +80,8 @@ class Deposit(models.Model):
             wallet_address_deposit.send(
                     sender=self.__class__,
                     instance = self,
+                    txid = self.txid,
+                    txid_website = self.token.chain.explorer_url.format(txid=self.txid),
                     from_address = self.counterparty_address,
                     to_address = self.deposit_address,
                     amount = self.amount,
@@ -162,6 +164,7 @@ class Withdraw(models.Model):
                 sender      = self.__class__,
                 instance    = self,
                 txid        = self.txid,
+                txid_website= self.token.chain.explorer_url.format(txid=self.txid),
                 to_address  = self.counterparty_address,
                 amount      = self.amount,
                 fee         = self.fee,
