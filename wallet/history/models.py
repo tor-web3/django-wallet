@@ -1,10 +1,13 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone, datetime_safe as datetime
 
 # Create your models here.
 from wallet.models import Token,Address
 from wallet.history import constant
+
+from uuid import uuid4
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -56,6 +59,9 @@ class Deposit(models.Model):
     block_time = models.DateTimeField(verbose_name=_("Block Time"),editable=False,
                                          null=True,blank=True,default=None)
 
+    def __str__(self):
+        return self.uuid
+    
     def save(self,*args,**kargs):
         try:
             if self.deposit_address:
@@ -142,7 +148,21 @@ class Withdraw(models.Model):
     block_time = models.DateTimeField(verbose_name=_("Block Time"),editable=False,
                                          null=True,blank=True,default=None)
 
+    def __str__(self):
+        return self.uuid
+    
+
     def save(self,*args,**kargs):
-        from uuid import uuid4
         self.uuid = uuid4()
         super().save(*args,**kargs)
+
+    
+    def cancel(self):
+        if self.status == constant.SUBMITTED:
+            self.status = constant.REJECT
+            self.error_info = "user cancel this order"
+            self.finished_time = timezone.now()
+            self.save(update_fields=["status","error_info","finished_time"])
+            return True
+        return False
+        
