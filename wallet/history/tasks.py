@@ -163,21 +163,28 @@ def check_trx_withdraw():
     for order in history:
         try:
             with transaction.atomic():
+                # 锁定订单
                 if order.status != Withdraw.objects.get(pk=order.pk).status:
                     logger.warning("状态发生非预期的行为")
                     continue
-                
                 order.status = constant.WITHDRAWING
                 order.save(update_fields=["status"])
-                
+
+                # 构建转账
+                token_obj = order.token
+                address = order.counterparty_address
+                amount = order.amount * (10 ** token_obj.token_decimal)
+                contract_address = token_obj.contract_address
+                chain_network = token_obj.chain.chain_network
                 result = transfer_trc20_tron(
-                    order.counterparty_address, 
-                    int(order.amount),
+                    address, 
+                    int(amount),
                     "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", 
-                    order.token.contract_address, 
-                    order.token.chain.chain_network
+                    contract_address, 
+                    chain_network
                 )
                 
+                # 填补订单信息
                 order.txid = result['id']
                 order.block_time = timezone.datetime.fromtimestamp(int(result['blockTimeStamp']) / 1000,timezone.utc)
                 order.success_info = json.dumps(result)
