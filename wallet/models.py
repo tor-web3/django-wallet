@@ -17,6 +17,11 @@ class CreateTracker(models.Model):
 class CreateUpdateTracker(CreateTracker):
     updated_at = models.DateTimeField(_("Updated Time"),auto_now=True,editable=False)
 
+    def save(self,update_fields=None,*args,**kwargs):
+        if update_fields:
+            update_fields.append("updated_at")
+        return super().save(update_fields=update_fields,*args,**kwargs)
+        
     class Meta(CreateTracker.Meta):
         abstract = True
 #################################################################

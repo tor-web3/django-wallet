@@ -1,10 +1,8 @@
 import requests
 from decimal import Decimal
 from typing import Union, List, Optional, Dict
-from jsonrpcclient import parse,Ok
 
-
-
+from wallet.helpers import get_trc20_balance
 from wallet.models import Token
 from wallet.chainstate.models import State
 from wallet.chainstate.utils import request_token_balance
@@ -49,9 +47,11 @@ def get_eth_address_balance(state_obj:'State', token_obj:'Token'):
 def get_trx_address_balance(state_obj:'State', token_obj:'Token'):
     addr_obj = state_obj.address
     # 构建地址代币余额请求接口
-    from wallet.helpers import get_trc20_balance
-
-    trc20_value = get_trc20_balance(addr_obj.address, token_obj.contract_address)
+    trc20_value = get_trc20_balance(
+        addr_obj.address, 
+        token_obj.contract_address,
+        token_obj.chain.chain_network,
+    )
     
     return trc20_value / (10**token_obj.token_decimal)
 
