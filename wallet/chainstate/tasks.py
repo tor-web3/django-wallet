@@ -49,22 +49,28 @@ def get_eth_address_balance(state_obj:'State', token_obj:'Token'):
 def get_trx_address_balance(state_obj:'State', token_obj:'Token'):
     addr_obj = state_obj.address
     # 构建地址代币余额请求接口
-    host_url = "https://apilist.tronscan.org/api/account/tokens"
-    token_info_url = f"{host_url}?address={addr_obj.address}&token={token_obj.token_symbol}"
-                    #&start=0&limit=20&hidden=0&show=0&sortType=0"
+    from wallet.helpers import get_trc20_balance
 
-    # 检测代币值变化
-    response = requests.get(
-        token_info_url
-    )
-    parsed_data = response.json()['data']
+    trc20_value = get_trc20_balance(addr_obj.address, token_obj.contract_address)
+    
+    return trc20_value / (10**token_obj.token_decimal)
 
-    # 寻找当前检测代币合约地址的对象
-    for data in parsed_data:
-        if token_obj.contract_address == data['tokenId']:
-            value:Decimal = Decimal(data['quantity']).quantize(Decimal('0.000000'))
-            return value
-    return None
+    # host_url = "https://apilist.tronscan.org/api/account/tokens"
+    # token_info_url = f"{host_url}?address={addr_obj.address}&token={token_obj.token_symbol}"
+    #                 #&start=0&limit=20&hidden=0&show=0&sortType=0"
+
+    # # 检测代币值变化
+    # response = requests.get(
+    #     token_info_url
+    # )
+    # parsed_data = response.json()['data']
+
+    # # 寻找当前检测代币合约地址的对象
+    # for data in parsed_data:
+    #     if token_obj.contract_address == data['tokenId']:
+    #         value:Decimal = Decimal(data['quantity']).quantize(Decimal('0.000000'))
+    #         return value
+    # return None
 
 
 def check_all_address_status(chain = 'TRX'):
