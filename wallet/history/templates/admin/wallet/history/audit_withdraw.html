@@ -4,6 +4,8 @@
 {% block submit_buttons_bottom %}
     {{ block.super }}
     <div class="submit-row">
-            <input type="submit" value={% trans "Allow Withdraw" %} name="allow">
+        <input type="submit" value={% trans "Audit" %} name="audit">
+        <input type="submit" value={% trans "Withdrawing" %} name="withdrawing">
+        <input type="submit" style="background-color:rgba(194,54,49,.75);" value={% trans "Refuse" %} name="refuse">
     </div>
 {% endblock %}
