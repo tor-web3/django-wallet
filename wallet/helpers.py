@@ -11,9 +11,9 @@ from wallet.constant import *
 from wallet.hdwallet import HDWallet
 from wallet import app_settings
 
-from tronpy import Tron, Contract
-from tronpy import AsyncTron, AsyncContract
-from tronpy.keys import PrivateKey
+from wallet.tronpy import Tron, Contract
+from wallet.tronpy import AsyncTron, AsyncContract
+from wallet.tronpy.keys import PrivateKey
 
 from logging import getLogger
 logger = getLogger(__name__)
