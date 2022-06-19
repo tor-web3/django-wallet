@@ -74,10 +74,10 @@ def write_value(values):
                             with open(f'./address_{6}.csv', 'a+') as load_f :load_f.writelines(f'{values[0]},{values[1]}\n')
                             if address[8] == address[9]:
                                 with open(f'./address_{7}.csv', 'a+') as load_f :load_f.writelines(f'{values[0]},{values[1]}\n')
-
-# for d in range(10000):
-#     for i in range(10000):
-#         values = test_generate_mnemonic()
-#         write_value(values)
-#     #     break
-#     # break
+if __name__ == '__main__':
+    for d in range(10000):
+        for i in range(10000):
+            values = test_generate_mnemonic()
+            write_value(values)
+        #     break
+        # break
