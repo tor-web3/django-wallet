@@ -10,19 +10,19 @@ from wallet.chainstate.signals import wallet_address_updated
 from typing import Any, Optional,List
 
 class RPC(CreateUpdateTracker):
-    chain = models.ForeignKey(Chain, related_name='wallet_chainstate_rpc', on_delete=models.CASCADE)
-    company = models.CharField(verbose_name=_("company"),max_length=128)
-    alias = models.CharField(verbose_name=_("alias"),max_length=128,blank=True,null=True,)
-    endpoint = models.CharField(verbose_name=_("endpoint"),max_length=128)
-    username = models.CharField(verbose_name=_("username"),max_length=128,blank=True,null=True,)
-    password = models.CharField(verbose_name=_("password"),max_length=128,blank=True,null=True,)
-    auth = models.CharField(verbose_name=_("auth"),max_length=128,choices=AUTH_TYPE,default=NORMAL)
+    chain       = models.ForeignKey(Chain, related_name='wallet_chainstate_rpc', on_delete=models.CASCADE)
+    company     = models.CharField(verbose_name=_("company"),max_length=128)
+    alias       = models.CharField(verbose_name=_("alias"),max_length=128,blank=True,null=True,)
+    endpoint    = models.CharField(verbose_name=_("endpoint"),max_length=128)
+    username    = models.CharField(verbose_name=_("username"),max_length=128,blank=True,null=True,)
+    password    = models.CharField(verbose_name=_("password"),max_length=128,blank=True,null=True,)
+    auth        = models.CharField(verbose_name=_("auth"),max_length=128,choices=AUTH_TYPE,default=NORMAL)
     
     def __str__(self):
         return f"{self.alias}-[{self.company}]"
 
     class Meta:
-        verbose_name = _('RPC')
+        verbose_name        = _('RPC')
         verbose_name_plural = _('RPC')
 
 
@@ -83,15 +83,15 @@ class State(CreateUpdateTracker):
     def balance(self,value:Decimal):
         if self.usdt_balance != value and value != None:
             self.usdt_balance = value
-            self.is_update = True
-            self.update_fields = ['usdt_balance','is_update']
+            self.is_update    = True
+            self.update_fields= ['usdt_balance','is_update']
             return self.usdt_balance
         return None
 
     def active(self):
-        now = timezone.now()
-        self.stop_at = now + timezone.timedelta(hours=24,minutes=0,seconds=0)
-        self.is_active = True
+        now             = timezone.now()
+        self.stop_at    = now + timezone.timedelta(hours=24,minutes=0,seconds=0)
+        self.is_active  = True
         self.save(update_fields=['stop_at','is_active'])
         
 
@@ -119,6 +119,6 @@ class State(CreateUpdateTracker):
         return f"{self.is_update}"
 
     class Meta:
-        verbose_name = _('State')
+        verbose_name        = _('State')
         verbose_name_plural = _('Status')
-        ordering = ["updated_at"]
+        ordering            = ["updated_at"]
