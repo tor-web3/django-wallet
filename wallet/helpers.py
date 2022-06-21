@@ -1,5 +1,5 @@
-
 from functools import partial
+from django.utils.translation import gettext_lazy as _
 
 from wallet.models import (
     Pubkey,
