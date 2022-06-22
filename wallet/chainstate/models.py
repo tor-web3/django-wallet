@@ -26,9 +26,9 @@ class RPC(CreateUpdateTracker):
         verbose_name_plural = _('RPC')
 
 
-class StateManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+# class StateManager(models.Manager):
+#     def get_queryset(self):
+#         return super().get_queryset().filter(is_active=True)
 
 class State(CreateUpdateTracker):
     
@@ -36,7 +36,7 @@ class State(CreateUpdateTracker):
         self.update_fields = []
         super(State,self).__init__(*args,**kwargs)
         
-    objects = StateManager()
+    # objects = StateManager()
 
     address = models.OneToOneField(Address, related_name="wallet_chainstate_state",on_delete=models.CASCADE)
     usdt_balance = models.DecimalField(
@@ -119,6 +119,6 @@ class State(CreateUpdateTracker):
         return f"{self.is_update}"
 
     class Meta:
-        verbose_name        = _('State')
-        verbose_name_plural = _('Status')
-        ordering            = ["updated_at"]
+        verbose_name        = _("State")
+        verbose_name_plural = _("Status")
+        ordering            = ["-is_active","-is_update","-updated_at"]
