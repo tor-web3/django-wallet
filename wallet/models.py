@@ -117,6 +117,21 @@ class Address(CreateUpdateTracker):
             "Unselect this instead of deleting address."
         ),
     )
+    is_use = models.BooleanField(
+        _("Use"),
+        default=False,
+        help_text=_(
+            "Whether the current address has been used, if there is a deposit record, set to True."
+        ),
+    )
+    is_select = models.BooleanField(
+        _("Select"),
+        default=True,
+        help_text=_(
+            "The address the user is currently using, when set to True, it will be displayed on top."
+        ),
+
+    )
 
 
     def __str__(self):
