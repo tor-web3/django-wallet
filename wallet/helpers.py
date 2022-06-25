@@ -80,6 +80,8 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
         try:
             ret_address = Address.objects.get(user=user,chain__chain_symbol=chain_symbol,index=index)
             ret_address.wallet_chainstate_state.active()
+            ret_address.is_select = True
+            ret_address.save(update_fields=['is_select'])
         except Address.DoesNotExist as e:
             # 创建钱包地址
             hdwallet: HDWallet = HDWallet(symbol=chain_symbol, use_default_path=False)
