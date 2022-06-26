@@ -1,0 +1,376 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-06-26 13:59+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\apps.py:8
+msgid "Wallet"
+msgstr ""
+
+#: .\chainstate\apps.py:9
+msgid "Wallet State"
+msgstr ""
+
+#: .\chainstate\constant.py:6
+msgid "normal"
+msgstr ""
+
+#: .\chainstate\models.py:14
+msgid "company"
+msgstr ""
+
+#: .\chainstate\models.py:15
+msgid "alias"
+msgstr ""
+
+#: .\chainstate\models.py:16
+msgid "endpoint"
+msgstr ""
+
+#: .\chainstate\models.py:17
+msgid "username"
+msgstr ""
+
+#: .\chainstate\models.py:18
+msgid "password"
+msgstr ""
+
+#: .\chainstate\models.py:19
+msgid "auth"
+msgstr ""
+
+#: .\chainstate\models.py:25 .\chainstate\models.py:26
+msgid "RPC"
+msgstr ""
+
+#: .\chainstate\models.py:43
+msgid "usdt balance"
+msgstr ""
+
+#: .\chainstate\models.py:48
+msgid "Stop Time"
+msgstr ""
+
+#: .\chainstate\models.py:50
+msgid "When to stop the test"
+msgstr ""
+
+#: .\chainstate\models.py:54
+msgid "active"
+msgstr ""
+
+#: .\chainstate\models.py:56
+msgid "Whether it is necessary to detect the operating status of the address"
+msgstr ""
+
+#: .\chainstate\models.py:60
+msgid "update"
+msgstr ""
+
+#: .\chainstate\models.py:62
+msgid "Status of address update"
+msgstr ""
+
+#: .\chainstate\models.py:65
+msgid "query count"
+msgstr ""
+
+#: .\chainstate\models.py:73
+msgid "Inactivity"
+msgstr ""
+
+#: .\chainstate\models.py:75
+msgid "Updated"
+msgstr ""
+
+#: .\chainstate\models.py:76 .\models.py:76 .\models.py:113
+msgid "Active"
+msgstr ""
+
+#: .\chainstate\models.py:122
+msgid "State"
+msgstr ""
+
+#: .\chainstate\models.py:123 .\history\models.py:48 .\history\models.py:134
+msgid "Status"
+msgstr ""
+
+#: .\constant.py:7
+msgid "deposit"
+msgstr ""
+
+#: .\constant.py:8
+msgid "system lease"
+msgstr ""
+
+#: .\helpers.py:36
+#, python-brace-format
+msgid "{chain_symbol} is not yet supported, please add it first."
+msgstr ""
+
+#: .\history\admin.py:50
+msgid "The order is abnormal and cannot be reviewed"
+msgstr ""
+
+#: .\history\admin.py:54
+msgid "Success"
+msgstr ""
+
+#: .\history\apps.py:8
+msgid "Wallet History"
+msgstr ""
+
+#: .\history\constant.py:11
+msgid "submitted"
+msgstr ""
+
+#: .\history\constant.py:12
+msgid "audited"
+msgstr ""
+
+#: .\history\constant.py:13
+msgid "reject"
+msgstr ""
+
+#: .\history\constant.py:14
+msgid "withdrawing"
+msgstr ""
+
+#: .\history\constant.py:15
+msgid "withdrawn"
+msgstr ""
+
+#: .\history\constant.py:16
+msgid "error"
+msgstr ""
+
+#: .\history\constant.py:21
+msgid "Tor"
+msgstr ""
+
+#: .\history\constant.py:22
+msgid "Huobi Global Limited"
+msgstr ""
+
+#: .\history\constant.py:29
+msgid "Manual"
+msgstr ""
+
+#: .\history\constant.py:30
+msgid "Robot"
+msgstr ""
+
+#: .\history\models.py:18 .\history\models.py:107
+msgid "History UUID"
+msgstr ""
+
+#: .\history\models.py:19 .\history\models.py:108
+msgid "TXID"
+msgstr ""
+
+#: .\history\models.py:22 .\history\models.py:111
+msgid "Internal CounterParty ID"
+msgstr ""
+
+#: .\history\models.py:27 .\history\models.py:116
+msgid "CounterParty Address"
+msgstr ""
+
+#: .\history\models.py:30
+msgid "Deposit Address"
+msgstr ""
+
+#: .\history\models.py:35
+msgid "Owner of the order"
+msgstr ""
+
+#: .\history\models.py:39 .\history\models.py:120
+msgid "Amount"
+msgstr ""
+
+#: .\history\models.py:44 .\history\models.py:130
+msgid "Memo"
+msgstr ""
+
+#: .\history\models.py:45 .\history\models.py:131 .\models.py:103
+msgid "Label/Tag/Memo"
+msgstr ""
+
+#: .\history\models.py:53 .\history\models.py:139
+msgid "Error Info"
+msgstr ""
+
+#: .\history\models.py:56 .\history\models.py:146 .\models.py:11
+msgid "Created Time"
+msgstr ""
+
+#: .\history\models.py:57 .\history\models.py:147 .\models.py:18
+msgid "Updated Time"
+msgstr ""
+
+#: .\history\models.py:58 .\history\models.py:148
+msgid "Finished Time"
+msgstr ""
+
+#: .\history\models.py:60 .\history\models.py:150
+msgid "Block Time"
+msgstr ""
+
+#: .\history\models.py:97 .\history\models.py:98
+msgid "Deposit"
+msgstr ""
+
+#: .\history\models.py:105 .\models.py:47 .\models.py:95
+msgid "User ID"
+msgstr ""
+
+#: .\history\models.py:125 .\models.py:71
+msgid "Fee"
+msgstr ""
+
+#: .\history\models.py:141
+msgid "Success Info"
+msgstr ""
+
+#: .\history\models.py:143
+msgid "Request Info"
+msgstr ""
+
+#: .\history\templates\admin\wallet\history\audit_withdraw.html:7
+msgid "Audit"
+msgstr ""
+
+#: .\history\templates\admin\wallet\history\audit_withdraw.html:8
+msgid "Withdrawing"
+msgstr ""
+
+#: .\history\templates\admin\wallet\history\audit_withdraw.html:9
+msgid "Refuse"
+msgstr ""
+
+#: .\models.py:30
+msgid "Chain Name"
+msgstr ""
+
+#: .\models.py:31
+msgid "Chain Network"
+msgstr ""
+
+#: .\models.py:32
+msgid "Chain Token Symbol"
+msgstr ""
+
+#: .\models.py:34
+msgid "Explorer URL"
+msgstr ""
+
+#: .\models.py:42 .\models.py:43
+msgid "chain"
+msgstr ""
+
+#: .\models.py:48
+msgid "Account Extended Public Key"
+msgstr ""
+
+#: .\models.py:56 .\models.py:57
+msgid "public key"
+msgstr ""
+
+#: .\models.py:65
+msgid "Contract Address"
+msgstr ""
+
+#: .\models.py:67
+msgid "Token Symbol"
+msgstr ""
+
+#: .\models.py:68
+msgid "Token Name"
+msgstr ""
+
+#: .\models.py:69
+msgid "Token Decimal"
+msgstr ""
+
+#: .\models.py:72
+msgid ""
+"The handling fee is only used as a record and cannot be used as a "
+"calculation parameter"
+msgstr ""
+
+#: .\models.py:79 .\models.py:116
+msgid ""
+"Designates whether this address should be treated as active. Unselect this "
+"instead of deleting address."
+msgstr ""
+
+#: .\models.py:88
+msgid "Token"
+msgstr ""
+
+#: .\models.py:89
+msgid "Tokens"
+msgstr ""
+
+#: .\models.py:97
+msgid "Public Key"
+msgstr ""
+
+#: .\models.py:102
+msgid "Label"
+msgstr ""
+
+#: .\models.py:104
+msgid "Inedx"
+msgstr ""
+
+#: .\models.py:106 .\models.py:141
+msgid "address"
+msgstr ""
+
+#: .\models.py:107
+msgid "Temporary discontinuation of service"
+msgstr ""
+
+#: .\models.py:109
+msgid "Address Type"
+msgstr ""
+
+#: .\models.py:121
+msgid "Use"
+msgstr ""
+
+#: .\models.py:124
+msgid ""
+"Whether the current address has been used, if there is a deposit record, set "
+"to True."
+msgstr ""
+
+#: .\models.py:128
+msgid "Select"
+msgstr ""
+
+#: .\models.py:131
+msgid ""
+"The address the user is currently using, when set to True, it will be "
+"displayed on top."
+msgstr ""
+
+#: .\models.py:142
+msgid "addresses"
+msgstr ""
