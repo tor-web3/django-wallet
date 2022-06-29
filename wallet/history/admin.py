@@ -15,7 +15,7 @@ class DepositAdmin(admin.ModelAdmin):
         "deposit_address","status",
         "created_time",
     )
-    list_filter = ("deposit__user","token__chain")
+    list_filter = ("token__chain",)
 
 class WithdrawAdmin(admin.ModelAdmin):
     list_display = (
