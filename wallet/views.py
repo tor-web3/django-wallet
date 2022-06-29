@@ -5,7 +5,6 @@ from django.views.generic.list import BaseListView,View
 
 
 class AddressActiveView(View):
-    """Handle AutocompleteWidget's AJAX requests for data."""
 
     def get(self, request, address, *args, **kwargs):
         try:
@@ -14,8 +13,7 @@ class AddressActiveView(View):
                     address__address   = address
                 )
             state_obj.is_update = True
-            state_obj.is_active = True
-            state_obj.save()
+            state_obj.flush()
                 
             return JsonResponse({
                 "results":"success"

@@ -28,3 +28,15 @@ python manage.py check_address_status -c [eth or trx]
 python manage.py check_address_deposit -c [eth or trx]
 ```
 
+# 更新地址
+接口: /wallet/address/{address}
+```
+{
+    "results": "success"
+}
+{
+    "results": [
+        "State matching query does not exist."
+    ]
+}
+```
