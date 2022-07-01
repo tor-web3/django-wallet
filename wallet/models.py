@@ -95,7 +95,7 @@ class Address(CreateUpdateTracker):
     user = models.ForeignKey(get_user_model(),related_name='wallet_address',null=True,verbose_name=_("User ID"),
                             on_delete=models.CASCADE)
     pubkey = models.ForeignKey(Pubkey,related_name="wallet_address",verbose_name=_("Public Key"),
-                            on_delete=models.CASCADE)
+                            on_delete=models.CASCADE,null=True)
     
     chain = models.ForeignKey(Chain, related_name="wallet_address",on_delete=models.CASCADE)
 
