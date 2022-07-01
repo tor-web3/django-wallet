@@ -34,7 +34,7 @@ class Chain(CreateUpdateTracker):
     explorer_url = models.CharField(verbose_name=_("Explorer URL"),max_length=255,null=True,blank=True)
 
     def __str__(self):
-        if 'mainnet' != self.chain_network:
+        if 'main' not in self.chain_network:
             return f"{self.chain_name}[{self.chain_network}]"
         return self.chain_name
 
