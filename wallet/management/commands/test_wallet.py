@@ -32,25 +32,39 @@ class Command(BaseCommand):
         from wallet.monero.backends.offline import OfflineWallet, WalletIsOffline
         from wallet.monero.wallet import Wallet
 
-        seed = Seed("尤 洗 综 吴 恢 势 课 哲 目 柯 涉 免 频 楚 客 中 竞 休 者 介 润 舰 太 项 综","Chinese (simplified)")
-        print(seed.public_address())
+        # seed = Seed("paper inline drowning tsunami romance software layout sowed hold bikini duration stick hubcaps dash biggest lagoon popular sack ecstatic ouch taken rounded else fidget dash")
+        # seed = Seed("2eb824cd1f2aff1091ec9995ddecab96e70cc4ed59cfd611fbc902358bba0e0c")
+        # # print(seed.hex_seed())
+        
+        # print(seed.public_address())
         # print(seed.secret_view_key())
-        # print(seed.secret_spend_key())
-        print("public_view_key")
-        print(ed25519.public_from_secret_hex(seed.secret_view_key()))
-        print(seed.public_view_key())
-        print("public_spend_key")
-        print(ed25519.public_from_secret_hex(seed.secret_spend_key()))
-        print(seed.public_spend_key())
+        # # print(seed.secret_spend_key())
+        # print("public_view_key")
+        # print(ed25519.public_from_secret_hex(seed.secret_view_key()))
+        # print(seed.public_view_key())
+        # print("public_spend_key")
+        # print(ed25519.public_from_secret_hex(seed.secret_spend_key()))
+        # print(seed.public_spend_key())
         
         wallet = Wallet(
-            # OfflineWallet(seed.public_address(), view_key=seed.secret_view_key())
-            OfflineWallet(seed.public_address(), view_key=seed.secret_view_key(), spend_key=seed.public_spend_key())
+            OfflineWallet("48NLPW7hugSV3MuXcLKmLzTvyZ4twYu9sWza8zz5Q6ueiocKWvz6QHUSxEwdTWgidNYv4C5AiGLFc4vCNU7bdkRf5R9BRob",
+             view_key="bdb9bc040c690bfccc6f4fdca66a705a046ac3402ccc2c38bb72f2aef3768900")
+            # OfflineWallet(seed.public_address(), view_key=seed.secret_view_key(), spend_key=seed.public_spend_key())
             # OfflineWallet(seed.public_address(), view_key=seed.secret_view_key(), spend_key=seed.secret_spend_key())
         )
         # print(wallet.new_address())
 
-        print(wallet.get_address(0, 1))
+        print(wallet.get_address(0, 0))
+        print(wallet.get_address(1, 1))
+        print(wallet.get_address(1, 1).view_key())
+        
+        wallet = Wallet(
+            OfflineWallet(wallet.get_address(1, 1),
+             view_key=wallet.get_address(1, 1).view_key())
+            # OfflineWallet(seed.public_address(), view_key=seed.secret_view_key(), spend_key=seed.public_spend_key())
+            # OfflineWallet(seed.public_address(), view_key=seed.secret_view_key(), spend_key=seed.secret_spend_key())
+        )
+        print(wallet.get_address(0, 0))
 
 
     
