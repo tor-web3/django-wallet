@@ -1,3 +1,6 @@
 [submodule "wallet/tronpy"]
 	path = wallet/tronpy
 	url = https://github.com/tor-web3/tronpy.git
+[submodule "wallet/monero"]
+	path = wallet/monero
+	url = https://github.com/tor-web3/monero-python.git

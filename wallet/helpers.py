@@ -19,6 +19,8 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 def get_deposit_address(user, chain_symbol, index=None, new_address=False) ->Address:
+    if chain_symbol == "XMR":
+        return generate_xmr_address(user, chain_symbol, index, DEPOSIT, new_address)
     return generate_address(user, chain_symbol, index, DEPOSIT, new_address)
 
 def get_system_lease_address(user,chain_symbol) -> Address:
@@ -45,6 +47,71 @@ def get_pubkey(user,chain_symbol) -> Pubkey:
             chain       = chain,
             public_key  = hdwallet.xpublic_key(),
         )
+
+def generate_xmr_address(user, chain_symbol, index:int=None, type=None, new_address=True) -> Address:
+    
+    """
+    根据用户ID生成钱包地址, 用户ID不变的情况下. 可以通过调整 index 参数来随意切换地址,地址总是稳定不变的
+    """
+    try:
+        pubkey = get_pubkey(user, chain_symbol)
+        
+        # 确认用户正在使用的地址下标
+        if index is None:
+            try:
+                filter_params = {
+                    "user" : user,
+                    "chain__chain_symbol" : chain_symbol
+                }
+                if not new_address:
+                    filter_params["is_select"] = True
+
+                address = Address.objects.filter(
+                    **filter_params
+                ).order_by("-index").first()
+                
+                # 确定 Index
+                index = (0 if not address else address.index)
+                if address and new_address:
+                    index = index + 1
+            except Address.DoesNotExist as e:
+                pass
+        
+        # 若已经存在该地址则返回，没有则创建
+        ret_address = None
+        try:
+            ret_address = Address.objects.get(user=user,chain__chain_symbol=chain_symbol,index=index)
+            ret_address.wallet_chainstate_state.active()
+            ret_address.is_select = True
+            ret_address.save(update_fields=['is_select'])
+        except Address.DoesNotExist as e:
+            # 创建钱包地址
+            hdwallet: HDWallet = HDWallet(symbol=chain_symbol, use_default_path=False)
+            hdwallet.from_xpublic_key(pubkey.public_key)
+            hdwallet.from_path(path=f"m/{index}")
+            address = hdwallet.p2pkh_address()
+
+            ret_address = Address.objects.create(
+                    user=user,
+                    pubkey=pubkey,
+                    chain=pubkey.chain,
+                    index=index,
+                    type=type,
+                    is_select=True,
+                    address=address
+                )
+
+        # 将新地址设为默认使用地址
+        Address.objects.filter(
+            user=user,
+            chain__chain_symbol=chain_symbol,
+            is_select=True
+        ).exclude(address=ret_address.address).update(is_select=False)
+
+        return ret_address
+    except Exception as e:
+        logger.error(msg="Exception while generating wallet address:", exc_info=e)
+
 
 
 def generate_address(user, chain_symbol,index:int=None, type=None, new_address=True) -> Address:
