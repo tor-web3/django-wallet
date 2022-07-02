@@ -203,13 +203,13 @@ def check_address(address,chain_symbol):
         if chain_symbol == "XMR":
             from monero.address import Address
             Address(address)
-            return True, chain_symbol
+            return True
         elif chain_symbol == "TRX":
             from wallet.tronpy.keys import is_address
-            return is_address(address), chain_symbol
+            return is_address(address)
         elif chain_symbol == "ETH":
             import re
-            return bool(re.match("0x[a-fA-F0-9]{40}$", address)), chain_symbol
+            return bool(re.match("0x[a-fA-F0-9]{40}$", address))
     except:
         return False
 
