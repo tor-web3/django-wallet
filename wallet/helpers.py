@@ -123,8 +123,6 @@ def generate_xmr_address(user, chain_symbol, index:int=None, type=None, new_addr
         logger.error(msg="Exception while generating wallet address:", exc_info=e)
         return None
 
-
-
 def generate_address(user, chain_symbol,index:int=None, type=None, new_address=True) -> Address:
     """
     根据用户ID生成钱包地址, 用户ID不变的情况下. 可以通过调整 index 参数来随意切换地址,地址总是稳定不变的
@@ -170,9 +168,6 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
     except Exception as e:
         logger.error(msg="Exception while generating wallet address:", exc_info=e)
 
-
-
-
 def transfer_trc20_tron(
     to_address:str,value:int,private_key:str,
     contract_address,
@@ -202,6 +197,21 @@ def get_trc20_balance(address, contract_address, network="mainnet"):
     contract = client.get_contract(contract_address)
     return contract.functions.balanceOf(address)
 
+
+def check_address(address,chain_symbol):
+    try:
+        if chain_symbol == "XMR":
+            from monero.address import Address
+            Address(address)
+            return True, chain_symbol
+        elif chain_symbol == "TRX":
+            from wallet.tronpy.keys import is_address
+            return is_address(address), chain_symbol
+        elif chain_symbol == "ETH":
+            import re
+            return bool(re.match("0x[a-fA-F0-9]{40}$", address)), chain_symbol
+    except:
+        return False
 
 # generate_eth_address = partial(transfer_trc20_tron, mainnet='ETH')
 
