@@ -15,7 +15,10 @@ from wallet.tronpy import Tron, Contract
 from wallet.tronpy import AsyncTron, AsyncContract
 from wallet.tronpy.keys import PrivateKey
 from wallet.monero.backends.offline import OfflineWallet, WalletIsOffline
+from wallet.monero.backends.jsonrpc.wallet import JSONRPCWallet
 from wallet.monero.wallet import Wallet
+from wallet.monero.account import Account
+from decimal import Decimal
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -74,13 +77,35 @@ def get_user_index(user, chain_symbol, index:int=None, new_address=True):
     return index
 
 def generate_xmr_address(user, chain_symbol, index:int=None, type=None, new_address=True) -> Address:
-    
     """
-    根据用户ID生成钱包地址, 用户ID不变的情况下. 可以通过调整 index 参数来随意切换地址,地址总是稳定不变的
+    根据用户ID生成钱包地址, 用户ID不变的情况下. 可以通过递增 index 参数来切换地址, 相同地址总是稳定不变的
     """
     try:
+        """
+        `monero-wallet-rpc`的钱包管理标的 `account` 和 `address`, 每个行为是根据 `account` 进行独立管理单元,
+        `address` 是通过 `create_address` RPC接口进行递增推导, `monero-wallet-rpc` 只扫描通过 `create_address` 接口创建的 `address`
+        本文不详细赘述关于`monero-wallet-rpc`的管理逻辑,可以查阅网上资料
+        https://www.getmonero.org/zh-cn/resources/developer-guides/wallet-rpc.html
+        保证 `Address` 表中的 `index` 字段的最大值与 `monero-wallet-rpc`的`address_index`最大值保持一致,是本函数的重要工作
+        """
+        # 获取最大index值
+        max_index = Address.objects.filter(
+            chain__chain_symbol=chain_symbol,
+        ).order_by("-index").first().index
+
         # 确认用户正在使用的地址下标
         index = get_user_index(user,chain_symbol,index,new_address)
+
+        # 若用户使用的下标大于最大创建地址下标,则进行扩容
+        if max_index < index:
+            # TODO 参数兼容
+            w = Wallet(JSONRPCWallet(port=38088))
+            while True:
+                # 创建钱包地址,使得当前钱包地址index匹配需求index
+                new_addr = w.new_address(str(i))
+                new_index = new_addr[1]
+                if index < new_index:
+                    break
         
         # 若已经存在该地址则返回，没有则创建
         ret_address = None
@@ -90,16 +115,15 @@ def generate_xmr_address(user, chain_symbol, index:int=None, type=None, new_addr
             ret_address.is_select = True
             ret_address.save(update_fields=['is_select'])
         except Address.DoesNotExist as e:
-            # 创建钱包地址
+            # 根据user.pk 与 index 离线创建钱包地址
             wallet = Wallet(
                 OfflineWallet(
                     address=app_settings.XMR_ADDRESS,
                     view_key=app_settings.XMR_SECRET_VIEW_KEY
                 )
             )
-            print(user.pk)
-            print(index)
-            address = wallet.get_address(user.pk, index)
+            # TODO 创建钱包地址
+            address = wallet.get_address(0, index).with_payment_id(user.pk)
 
             ret_address = Address.objects.create(
                     user=user,
@@ -192,6 +216,26 @@ def transfer_trc20_tron(
     receipt = txn.wait()
     return receipt
 
+def transfer_xmr(to_address:str,value:int, my_address:str,**kwargs):
+    # TODO: 存入可执行后端, 获取当前有余额的用户索引, 统一提币转账
+    w = Wallet(JSONRPCWallet(port=38088))
+    for act in w.accounts:
+        # 检查账户余额
+        # TODO: 将余额更新到数据库中,如果有更新的话
+        all_account_balance = act.balances()
+        unlock_account_balance = all_account_balance[1]
+        # account_balance = act.balance()
+        transfer_amount = Decimal(str(value))
+        surplus_amount = transfer_amount - unlock_account_balance
+        # 若足以支付订单余额,则进行转账,并将剩余资金流入找零地址
+        if surplus_amount > Decimal("0"):
+            txns = act.transfer(
+                to_address, transfer_amount
+                # (my_address, surplus_amount)
+            )
+        # TODO:记录剩余余额变化情况
+    
+
 def get_trc20_balance(address, contract_address, network="mainnet"):
     client = Tron(network=network)
     contract = client.get_contract(contract_address)
@@ -213,7 +257,6 @@ def check_address(address,chain_symbol):
     except:
         return False
 
-# generate_eth_address = partial(transfer_trc20_tron, mainnet='ETH')
 
 generate_eth_address = partial(generate_address, chain_symbol='ETH')
 generate_trx_address = partial(generate_address, chain_symbol='TRX')
