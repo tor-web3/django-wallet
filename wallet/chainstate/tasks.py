@@ -4,12 +4,17 @@ from typing import Union, List, Optional, Dict
 
 from wallet.helpers import get_trc20_balance
 from wallet.models import Token
-from wallet.chainstate.models import State
-from wallet.chainstate.utils import request_token_balance
+from wallet.chainstate.models import State,Node
+from wallet.chainstate.utils import (
+    request_token_balance,
+    request_block_by_number,
+    request_transaction_receipt
+)
 
 from test_app.celery import app
 from celery.utils.log import get_task_logger as getLogger
 logger = getLogger(__name__)
+from jsonrpcclient import parse,Ok
 
 @app.task()
 def check_address_status(chain:str=None):
@@ -106,3 +111,65 @@ def check_all_address_status(chain = 'TRX'):
                 logger.error(f"{state_obj.address} get balance error",exc_info=e.args)
                 raise e
     return update_count
+
+# TODO 尚未完善,存在RPC请求超时的异常处理
+# 可考虑使用浏览器API获取区块代币交易
+# https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=50&start=0&sort=-timestamp&count=true&block=42155000
+def check_address_in_trx_block(node_info:Node):
+    # 获取区块信息
+    response = requests.post(
+        f"{node_info.rpc.endpoint}/jsonrpc",
+        json=request_block_by_number(
+            node_info.block_number + 1
+        )
+    )
+    
+    # 解析区块交易数据
+    parsed = parse(response.json())
+    if isinstance(parsed, Ok):
+        txs = parsed.result["transactions"]
+        address_list = []
+        from wallet.tronpy.keys import to_base58check_address
+        for tx in txs:
+            to_address = to_base58check_address(tx["to"])
+            from_address =  to_base58check_address(tx["from"])
+            address_list = address_list + [
+                to_address,
+                from_address,
+            ]
+
+            if "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" == to_address:
+                txid = tx['hash']
+                # TODO USDT代币交易
+                response_tx = requests.post(
+                    f"{node_info.rpc.endpoint}/jsonrpc",
+                    json=request_transaction_receipt(
+                        txid
+                    )
+                )
+                
+                parsed_tx = parse(response_tx.json())
+                topics = parsed_tx.result["logs"][0]["topics"]
+                token_from_address = to_base58check_address(f"0x{topics[1][-40:]}")
+                token_to_address = to_base58check_address(f"0x{topics[2][-40:]}")
+                address_list = address_list + [
+                    token_from_address,
+                    token_to_address
+                ]
+        else:
+            
+            address_set = list(set(address_list))
+
+            # 区块索引递增
+            node_info.block_number = int(parsed.result.number,16)
+            node_info.save()
+
+    return None
+    
+
+def check_address_in_block():
+    nodes = Node.objects.all()
+    for node in nodes:
+        if node.chain.chain_symbol == "TRX":
+            check_address_in_trx_block(node)
+

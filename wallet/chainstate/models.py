@@ -25,6 +25,12 @@ class RPC(CreateUpdateTracker):
         verbose_name        = _('RPC')
         verbose_name_plural = _('RPC')
 
+class Node(CreateUpdateTracker):
+    chain       = models.ForeignKey(Chain,  on_delete = models.CASCADE)
+    rpc         = models.ForeignKey(RPC,    on_delete = models.CASCADE)
+    block_number= models.IntegerField(verbose_name    = _("Block Number"))
+    
+
 
 # class StateManager(models.Manager):
 #     def get_queryset(self):
