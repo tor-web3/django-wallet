@@ -112,10 +112,55 @@ def check_all_address_status(chain = 'TRX'):
                 raise e
     return update_count
 
+
+def get_all_address_in_trc20_block_from_transcan(block_number):
+    # https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=50&start=0&sort=-timestamp&count=true&block=42155000
+    address_list = []
+    current_index = 0
+    endpoint = "https://apilist.tronscanapi.com"
+    trc20_transfer_uri = "api/token_trc20/transfers"
+    STEP_LENGTH = 50
+    params = "limit={step_length}&start={current_index}&sort=-timestamp&count=true&block={block_number}"
+
+    # 获取区块所有交易数据
+    while True:
+        trc20_params = params.format(step_length=STEP_LENGTH,current_index=current_index,block_number=block_number)
+        url = f"{endpoint}/{trc20_transfer_uri}?{trc20_params}"
+        response = requests.get(url)
+        if response.status_code != 200:
+            logger.warning("请求发生错误")
+            return
+        
+        # 解析区块交易
+        res_json = response.json()
+        total_txs = res_json["total"]
+        txs = res_json["token_transfers"]
+
+        # 检验区块新交易条数
+        if len(txs) == 0:
+            break
+        
+        # 检验
+        for tx in txs:
+            from_address = tx["from_address"]
+            to_address = tx["to_address"]
+            address_list = address_list + [
+                from_address,
+                to_address
+            ]
+        else:
+            current_index = current_index + STEP_LENGTH
+            # 区块交易索引超过预期
+            if current_index > total_txs:
+                break
+    ret_list = list(set(address_list))
+    return ret_list
+
+
 # TODO 尚未完善,存在RPC请求超时的异常处理
 # 可考虑使用浏览器API获取区块代币交易
 # https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=50&start=0&sort=-timestamp&count=true&block=42155000
-def check_address_in_trx_block(node_info:Node):
+def check_address_in_trx_block_from_jsonrpc(node_info:Node):
     # 获取区块信息
     response = requests.post(
         f"{node_info.rpc.endpoint}/jsonrpc",
@@ -125,10 +170,10 @@ def check_address_in_trx_block(node_info:Node):
     )
     
     # 解析区块交易数据
+    address_list = []
     parsed = parse(response.json())
     if isinstance(parsed, Ok):
         txs = parsed.result["transactions"]
-        address_list = []
         from wallet.tronpy.keys import to_base58check_address
         for tx in txs:
             to_address = to_base58check_address(tx["to"])
@@ -164,12 +209,31 @@ def check_address_in_trx_block(node_info:Node):
             node_info.block_number = int(parsed.result.number,16)
             node_info.save()
 
-    return None
+    return address_list
     
 
+@app.task()
 def check_address_in_block():
     nodes = Node.objects.all()
+    address_list = []
     for node in nodes:
         if node.chain.chain_symbol == "TRX":
-            check_address_in_trx_block(node)
+            address_list = address_list + get_all_address_in_trc20_block_from_transcan(node.block_number)
+            node.block_number = node.block_number + 1
+            node.save(update_fields=["block_number"])
+    
+    from django.db.models import Q
+    q = Q()
+    q.connector = "OR"
+    for address in address_list:
+        q.children.append(("address__address", address))
+
+    state_objs = State.objects.filter(q)
+
+    for state in state_objs:
+        state.active()
+        state.balance = state.balance + Decimal(0.000001)
+        state.flush()
+
+
 
