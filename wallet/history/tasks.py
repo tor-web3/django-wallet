@@ -16,7 +16,7 @@ from wallet.history import constant
 from wallet.history.models import Deposit,Withdraw
 
 from django.conf import settings
-from test_app.celery import app
+from libraries.celery import app
 from celery.utils.log import get_task_logger as getLogger
 logger = getLogger(__name__)
 

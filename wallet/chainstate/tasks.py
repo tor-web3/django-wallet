@@ -11,7 +11,9 @@ from wallet.chainstate.utils import (
     request_transaction_receipt
 )
 
-from test_app.celery import app
+from django.conf import settings
+from django.db.models import Q
+from libraries.celery import app
 from celery.utils.log import get_task_logger as getLogger
 logger = getLogger(__name__)
 from jsonrpcclient import parse,Ok
@@ -218,11 +220,14 @@ def check_address_in_block():
     address_list = []
     for node in nodes:
         if node.chain.chain_symbol == "TRX":
-            address_list = address_list + get_all_address_in_trc20_block_from_transcan(node.block_number)
+            if settings.DEBUG == True:
+                address_list = address_list + get_all_address_in_trc20_block_from_transcan(42155000)
+            else:
+                address_list = address_list + get_all_address_in_trc20_block_from_transcan(node.block_number)
             node.block_number = node.block_number + 1
             node.save(update_fields=["block_number"])
     
-    from django.db.models import Q
+    # TODO:理论单次 OR 地址不超过500个
     q = Q()
     q.connector = "OR"
     for address in address_list:
@@ -231,6 +236,8 @@ def check_address_in_block():
     state_objs = State.objects.filter(q)
 
     for state in state_objs:
+        if state.is_update:
+            continue
         state.active()
         state.balance = state.balance + Decimal(0.000001)
         state.flush()
