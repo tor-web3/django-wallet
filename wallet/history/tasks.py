@@ -194,11 +194,11 @@ def check_trx_withdraw():
                         'success_info'
                     ]
                 )
+        except SSLError as e:
+            logger.error("网络连接错误")
         except Exception as e:
             logger.error(f"未知错误:{e.args}")
             order.error_info = e.args
             order.status = constant.ERROR
             order.save(update_fields=["error_info","status"])
             continue
-        except SSLError as e:
-            logger.error("网络连接错误")

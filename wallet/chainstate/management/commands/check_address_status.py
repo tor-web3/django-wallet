@@ -22,6 +22,8 @@ class Command(BaseCommand):
 
         updated_count = check_address_status(chain)
         print(f"{updated_count} addresses have state changes")
-    
+
+        # from wallet.chainstate.tasks import check_address_in_block
+        # check_address_in_block()
 
     
