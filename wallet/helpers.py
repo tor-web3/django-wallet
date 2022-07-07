@@ -1,6 +1,6 @@
 from functools import partial
 from django.utils.translation import gettext_lazy as _
-
+from django.conf import settings
 from wallet.models import (
     Pubkey,
     Chain,
@@ -89,23 +89,29 @@ def generate_xmr_address(user, chain_symbol, index:int=None, type=None, new_addr
         保证 `Address` 表中的 `index` 字段的最大值与 `monero-wallet-rpc`的`address_index`最大值保持一致,是本函数的重要工作
         """
         # 获取最大index值
-        max_index = Address.objects.filter(
-            chain__chain_symbol=chain_symbol,
-        ).order_by("-index").first().index
+        try:
+            max_index = Address.objects.filter(
+                chain__chain_symbol=chain_symbol,
+            ).order_by("-index").first().index
+        except:
+            max_index = -1
 
         # 确认用户正在使用的地址下标
         index = get_user_index(user,chain_symbol,index,new_address)
 
         # 若用户使用的下标大于最大创建地址下标,则进行扩容
-        if max_index < index:
+        if max_index < index or max_index == -1:
             # TODO 参数兼容
-            w = Wallet(JSONRPCWallet(port=38088))
-            while True:
-                # 创建钱包地址,使得当前钱包地址index匹配需求index
-                new_addr = w.new_address(str(i))
-                new_index = new_addr[1]
-                if index < new_index:
-                    break
+            try:
+                w = Wallet(JSONRPCWallet(port=38088))
+                while True:
+                    # 创建钱包地址,使得当前钱包地址index匹配需求index
+                    new_addr = w.new_address(str(i))
+                    new_index = new_addr[1]
+                    if index < new_index:
+                        break
+            except:
+                logger.warning("无法正常连接本地的RPC节点")
         
         # 若已经存在该地址则返回，没有则创建
         ret_address = None
@@ -124,11 +130,13 @@ def generate_xmr_address(user, chain_symbol, index:int=None, type=None, new_addr
             )
             # TODO 创建钱包地址
             address = wallet.get_address(0, index).with_payment_id(user.pk)
-
+            chain = Chain.objects.get(chain_symbol=chain_symbol,chain_network="main")
+            if settings.DEBUG:
+                chain = Chain.objects.get(chain_symbol=chain_symbol,chain_network="stagenet")
             ret_address = Address.objects.create(
                     user=user,
                     # pubkey=pubkey,
-                    chain=Chain.objects.get(chain_symbol=chain_symbol),
+                    chain=chain,
                     index=index,
                     type=type,
                     is_select=True,
