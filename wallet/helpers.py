@@ -101,7 +101,7 @@ def generate_xmr_address(user, chain_symbol, index:int=None, type=None, new_addr
 
         # 若用户使用的下标大于最大创建地址下标,则进行扩容
         if max_index < index or max_index == -1:
-            # TODO 参数兼容
+            # TODO 参数兼容,可以考虑将此处代码异步执行
             try:
                 w = Wallet(JSONRPCWallet(port=38088),timeout=3)
                 while True:
