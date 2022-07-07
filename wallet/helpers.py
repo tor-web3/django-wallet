@@ -128,7 +128,7 @@ def generate_xmr_address(user, chain_symbol, index:int=None, type=None, new_addr
                     view_key=app_settings.XMR_SECRET_VIEW_KEY
                 )
             )
-            # TODO 创建钱包地址, 子地址无法创建支付ID地址
+            # TIP: 创建钱包地址, 子地址无法创建支付ID地址
             address = wallet.get_address(user.pk, index)
             chain = Chain.objects.get(chain_symbol=chain_symbol,chain_network="main")
             if settings.DEBUG:

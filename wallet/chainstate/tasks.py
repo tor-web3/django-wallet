@@ -159,9 +159,10 @@ def get_all_address_in_trc20_block_from_transcan(block_number):
     return ret_list
 
 
-# TODO 尚未完善,存在RPC请求超时的异常处理
+# TIP: 尚未完善,存在RPC请求超时的异常处理
 # 可考虑使用浏览器API获取区块代币交易
 # https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=50&start=0&sort=-timestamp&count=true&block=42155000
+# 2022-07-07 弃用,通过RPC确认余额的方式不适用于多地址环境
 def check_address_in_trx_block_from_jsonrpc(node_info:Node):
     # 获取区块信息
     response = requests.post(
@@ -227,7 +228,9 @@ def check_address_in_block():
             node.block_number = node.block_number + 1
             node.save(update_fields=["block_number"])
     
-    # TODO:理论单次 OR 地址不超过500个
+    # TIP:理论单次 OR 地址不超过500个
+    if len(address_list) > 500:
+        logger.warning("地址超过500个,请注意参数优化")
     q = Q()
     q.connector = "OR"
     for address in address_list:
