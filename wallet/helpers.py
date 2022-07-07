@@ -103,7 +103,7 @@ def generate_xmr_address(user, chain_symbol, index:int=None, type=None, new_addr
         if max_index < index or max_index == -1:
             # TODO 参数兼容
             try:
-                w = Wallet(JSONRPCWallet(port=38088))
+                w = Wallet(JSONRPCWallet(port=38088),timeout=3)
                 while True:
                     # 创建钱包地址,使得当前钱包地址index匹配需求index
                     new_addr = w.new_address(str(i))
