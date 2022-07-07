@@ -111,7 +111,7 @@ def generate_xmr_address(user, chain_symbol, index:int=None, type=None, new_addr
                     if index < new_index:
                         break
             except:
-                logger.warning("无法正常连接本地的RPC节点")
+                logger.warning("无法正常连接本地的RPC节点,可能会造成无法正常监测余额")
         
         # 若已经存在该地址则返回，没有则创建
         ret_address = None
