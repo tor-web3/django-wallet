@@ -73,6 +73,7 @@ def get_user_index(user, chain_symbol, index:int=None, new_address=True):
             if address and new_address:
                 index = index + 1
         except Address.DoesNotExist as e:
+            logger.debug(e.args)
             return 0
     return index
 
@@ -93,7 +94,8 @@ def generate_xmr_address(user, chain_symbol, index:int=None, type=None, new_addr
             max_index = Address.objects.filter(
                 chain__chain_symbol=chain_symbol,
             ).order_by("-index").first().index
-        except:
+        except Exception as e:
+            logger.debug(e.args)
             max_index = -1
 
         # 确认用户正在使用的地址下标
