@@ -1,4 +1,4 @@
-from wallet import views
+from wallet.chainstate import views
 from django.urls import path
 
 urlpatterns = [
