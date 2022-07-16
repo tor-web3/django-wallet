@@ -10,7 +10,7 @@ from django.utils import timezone, datetime_safe as datetime
 from django.db.utils import IntegrityError
 
 from wallet.models import Token
-from wallet.helpers import transfer_trc20_tron
+from wallet.helpers import transfer_tron
 from wallet.chainstate.models import State
 from wallet.history import constant
 from wallet.history.models import Deposit,Withdraw
@@ -176,12 +176,13 @@ def check_trx_withdraw():
                 amount = order.amount * (10 ** token_obj.token_decimal)
                 contract_address = token_obj.contract_address
                 chain_network = token_obj.chain.chain_network
-                result = transfer_trc20_tron(
-                    address, 
-                    int(amount),
-                    "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", 
-                    contract_address, 
-                    chain_network
+                result = transfer_tron(
+                    to_address = address, 
+                    value = int(amount),
+                    private_key = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", 
+                    memo=order.memo,
+                    contract_address=contract_address, 
+                    network = chain_network
                 )
                 
                 # 填补订单信息
