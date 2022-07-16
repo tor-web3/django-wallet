@@ -1,10 +1,11 @@
+from jsonrpcclient import parse, Ok
 import requests
 from decimal import Decimal
 from typing import Union, List, Optional, Dict
 
 from wallet.helpers import get_trc20_balance
 from wallet.models import Token
-from wallet.chainstate.models import State,Node
+from wallet.chainstate.models import State, Node
 from wallet.chainstate.utils import (
     request_token_balance,
     request_block_by_number,
@@ -16,10 +17,10 @@ from django.db.models import Q
 from libraries.celery import app
 from celery.utils.log import get_task_logger as getLogger
 logger = getLogger(__name__)
-from jsonrpcclient import parse,Ok
+
 
 @app.task()
-def check_address_status(chain:str=None):
+def check_address_status(chain: str = None):
     """
     检查所有 State 表下的钱包地址余额状态
     若余额发生变化，则更新 is_update、usdt_balance、query_count字段
@@ -34,9 +35,49 @@ def check_address_status(chain:str=None):
     return updated_count
 
 
-def get_eth_address_balance(state_obj:'State', token_obj:'Token'):
+@app.task()
+def address_update_notification():
+    # 获取数据库已经更新的地址
+    # 制作通告交易格式: address_update_notification?address=TMmeLvBeeCeYkWYNQKAeJqBKLCDhQ6qpf3&contract=TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t
+    # 可选参数包括: address[允许为数组], contract, txid
+    # 发送交易通过备注交易
+    # 将地址的状态改为非活跃
+    state_obj_list = State.objects.filter(is_active=True,is_update=True)[:10]
+
+    address_list = [state_obj.address.address for state_obj in state_obj_list]
+    address_list_params = ",".join(address_list)
+    url = f"address_update_notification?address={address_list_params}"
+
+    # TODO: 加密传输
+    # import rsa
+    # key = rsa.newkeys(1024)#生成随机秘钥
+    # privateKey = key[1]#私钥
+    # publicKey = key[0]#公钥
+    # message =url
+    # print('Before encrypted:',message)
+    # message = message.encode()
+    # cryptedMessage = rsa.encrypt(message, publicKey)
+    # print('After encrypted:\n',cryptedMessage)
+    # message = rsa.decrypt(cryptedMessage, privateKey)
+    # message = message.decode()
+    # print('After decrypted:',message)
+
+    private_key = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    to_address = "TMmeLvBeeCeYkWYNQKAeJqBKLCDhQ6qpf3"
+    value = 1
+    from wallet.helpers import transfer_tron
+    transfer_tron(to_address, value, private_key, memo=cryptedMessage, network="nile")
+
+    State.objects.filter(
+        pk__in=[state_obj.pk for state_obj in state_obj_list]
+    ).update(
+        is_update=False
+    )
+
+
+def get_eth_address_balance(state_obj: 'State', token_obj: 'Token'):
     addr_obj = state_obj.address
-    
+
     response = requests.post(
         state_obj.rpc.endpoint,
         json=request_token_balance(
@@ -44,22 +85,23 @@ def get_eth_address_balance(state_obj:'State', token_obj:'Token'):
             token_obj.contract_address
         )
     )
-            
+
     parsed = parse(response.json())
     if isinstance(parsed, Ok):
-        value:Decimal = Decimal(int(parsed.result,16)) / (10 ** 6)
+        value: Decimal = Decimal(int(parsed.result, 16)) / (10 ** 6)
         return value
     return None
 
-def get_trx_address_balance(state_obj:'State', token_obj:'Token'):
+
+def get_trx_address_balance(state_obj: 'State', token_obj: 'Token'):
     addr_obj = state_obj.address
     # 构建地址代币余额请求接口
     trc20_value = get_trc20_balance(
-        addr_obj.address, 
+        addr_obj.address,
         token_obj.contract_address,
         token_obj.chain.chain_network,
     )
-    
+
     return trc20_value / (10**token_obj.token_decimal)
 
     # host_url = "https://apilist.tronscan.org/api/account/tokens"
@@ -80,7 +122,7 @@ def get_trx_address_balance(state_obj:'State', token_obj:'Token'):
     # return None
 
 
-def check_all_address_status(chain = 'TRX'):
+def check_all_address_status(chain='TRX'):
     """
     检测波场地址的余额状态
     """
@@ -97,7 +139,7 @@ def check_all_address_status(chain = 'TRX'):
         # 寻找符合对应公链地址的待检测对象
         state_objs = State.objects.filter(
             is_active=True,
-            rpc__chain=token_obj.chain,is_update=False,
+            rpc__chain=token_obj.chain, is_update=False,
         )[:20]
         for state_obj in state_objs:
             try:
@@ -105,12 +147,13 @@ def check_all_address_status(chain = 'TRX'):
                     state_obj=state_obj,
                     token_obj=token_obj
                 )
-        
+
                 if state_obj.is_update:
                     update_count = update_count + 1
                 state_obj.flush()
             except Exception as e:
-                logger.error(f"{state_obj.address} get balance error",exc_info=e.args)
+                logger.error(
+                    f"{state_obj.address} get balance error", exc_info=e.args)
                 raise e
     return update_count
 
@@ -126,13 +169,14 @@ def get_all_address_in_trc20_block_from_transcan(block_number):
 
     # 获取区块所有交易数据
     while True:
-        trc20_params = params.format(step_length=STEP_LENGTH,current_index=current_index,block_number=block_number)
+        trc20_params = params.format(
+            step_length=STEP_LENGTH, current_index=current_index, block_number=block_number)
         url = f"{endpoint}/{trc20_transfer_uri}?{trc20_params}"
         response = requests.get(url)
         if response.status_code != 200:
             logger.warning("请求发生错误")
             return
-        
+
         # 解析区块交易
         res_json = response.json()
         total_txs = res_json["total"]
@@ -141,7 +185,7 @@ def get_all_address_in_trc20_block_from_transcan(block_number):
         # 检验区块新交易条数
         if len(txs) == 0:
             break
-        
+
         # 检验
         for tx in txs:
             from_address = tx["from_address"]
@@ -163,7 +207,7 @@ def get_all_address_in_trc20_block_from_transcan(block_number):
 # 可考虑使用浏览器API获取区块代币交易
 # https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=50&start=0&sort=-timestamp&count=true&block=42155000
 # 2022-07-07 弃用,通过RPC确认余额的方式不适用于多地址环境
-def check_address_in_trx_block_from_jsonrpc(node_info:Node):
+def check_address_in_trx_block_from_jsonrpc(node_info: Node):
     # 获取区块信息
     response = requests.post(
         f"{node_info.rpc.endpoint}/jsonrpc",
@@ -171,7 +215,7 @@ def check_address_in_trx_block_from_jsonrpc(node_info:Node):
             node_info.block_number + 1
         )
     )
-    
+
     # 解析区块交易数据
     address_list = []
     parsed = parse(response.json())
@@ -180,7 +224,7 @@ def check_address_in_trx_block_from_jsonrpc(node_info:Node):
         from wallet.tronpy.keys import to_base58check_address
         for tx in txs:
             to_address = to_base58check_address(tx["to"])
-            from_address =  to_base58check_address(tx["from"])
+            from_address = to_base58check_address(tx["from"])
             address_list = address_list + [
                 to_address,
                 from_address,
@@ -195,25 +239,27 @@ def check_address_in_trx_block_from_jsonrpc(node_info:Node):
                         txid
                     )
                 )
-                
+
                 parsed_tx = parse(response_tx.json())
                 topics = parsed_tx.result["logs"][0]["topics"]
-                token_from_address = to_base58check_address(f"0x{topics[1][-40:]}")
-                token_to_address = to_base58check_address(f"0x{topics[2][-40:]}")
+                token_from_address = to_base58check_address(
+                    f"0x{topics[1][-40:]}")
+                token_to_address = to_base58check_address(
+                    f"0x{topics[2][-40:]}")
                 address_list = address_list + [
                     token_from_address,
                     token_to_address
                 ]
         else:
-            
+
             address_set = list(set(address_list))
 
             # 区块索引递增
-            node_info.block_number = int(parsed.result.number,16)
+            node_info.block_number = int(parsed.result.number, 16)
             node_info.save()
 
     return address_list
-    
+
 
 @app.task()
 def check_address_in_block():
@@ -222,12 +268,15 @@ def check_address_in_block():
     for node in nodes:
         if node.chain.chain_symbol == "TRX":
             if settings.DEBUG == True:
-                address_list = address_list + get_all_address_in_trc20_block_from_transcan(42155000)
+                address_list = address_list + \
+                    get_all_address_in_trc20_block_from_transcan(42155000)
             else:
-                address_list = address_list + get_all_address_in_trc20_block_from_transcan(node.block_number)
+                address_list = address_list + \
+                    get_all_address_in_trc20_block_from_transcan(
+                        node.block_number)
             node.block_number = node.block_number + 1
             node.save(update_fields=["block_number"])
-    
+
     # TIP:理论单次 OR 地址不超过500个
     if len(address_list) > 500:
         logger.warning("地址超过500个,请注意参数优化")
@@ -244,6 +293,3 @@ def check_address_in_block():
         state.active()
         state.balance = state.balance + Decimal(0.000001)
         state.flush()
-
-
-
