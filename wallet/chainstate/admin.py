@@ -28,7 +28,7 @@ class StateAdmin(admin.ModelAdmin):
         
     @admin.action(description='Mark selected state as update')
     def make_update(self, request, queryset):
-        queryset.update(is_update=False,usdt_balance=0)
+        queryset.update(is_update=True,usdt_balance=0)
 
     list_display = ("address","query_count","balance","is_update","is_active","rpc","stop_at","updated_at")
 
