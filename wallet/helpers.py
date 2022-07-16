@@ -202,26 +202,45 @@ def generate_address(user, chain_symbol,index:int=None, type=None, new_address=T
     except Exception as e:
         logger.error(msg="Exception while generating wallet address:", exc_info=e)
 
-def transfer_trc20_tron(
-    to_address:str,value:int,private_key:str,
-    contract_address,
-    network
+def transfer_tron(
+    to_address:str,value:int,private_key:str,memo:str="",
+    contract_address = None,
+    network = "mainnet"
 ):
     priv_key = PrivateKey(bytes.fromhex(private_key))
     from_address = priv_key.public_key.to_base58check_address()
     client = Tron(network=network)
-    contract = client.get_contract(contract_address)
-    # print('Balance', contract.functions.balanceOf('TGQgfK497YXmjdgvun9Bg5Zu3xE15v17cu'))
+    txn = None
+    # TRC20交易
+    logger.debug(f"[{network}]{from_address} --{value}[{contract_address}]--> {to_address}")
+    if contract_address:
+        contract = client.get_contract(contract_address)
+        # print('Balance', contract.functions.balanceOf('TGQgfK497YXmjdgvun9Bg5Zu3xE15v17cu'))
+        if memo:
+            logger.warning(f"TRC20交易不支持备注({memo})")
 
-    txn = (
-        contract.functions.transfer(to_address, value)
-        .with_owner(from_address)
-        .fee_limit(5_000_000_000)
-        .build()
-        .sign(priv_key)
-        .inspect()
-        .broadcast()
-    )
+        txn = (
+            contract.functions.transfer(to_address, value)
+            .with_owner(from_address)
+            .fee_limit(5_000_000_000)
+            .build()
+            .sign(priv_key)
+            .inspect()
+            .broadcast()
+        )
+    else:
+        tx_obj = client.trx.transfer(from_address, to_address, value)
+        if memo:
+            tx_obj = tx_obj.memo(memo)
+        txn = (
+            tx_obj
+            .with_owner(from_address)
+            # .fee_limit(5_000_000_000)
+            .build()
+            .sign(priv_key)
+            .inspect()
+            .broadcast()
+        )
     
     receipt = txn.wait()
     return receipt
