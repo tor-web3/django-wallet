@@ -1,27 +1,23 @@
 from django.views import View
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 
 import logging
 logger = logging.getLogger(__name__)
 
 
+class AddressDepositView(View):
 
-class AddressActiveView(View):
-
-    def get(self, request, address, *args, **kwargs):
+    @method_decorator(csrf_exempt)
+    def post(self, request, *args, **kwargs):
         try:
-            from wallet.chainstate.models import State
-            state_obj = State.objects.get(
-                    address__address   = address
-                )
-            state_obj.is_update = True
-            state_obj.flush()
-                
+            print(request.POST)
             return JsonResponse({
                 "results":"success"
             })
-        except State.DoesNotExist as e:
+        except Exception as e:
             return JsonResponse({
                 "results": e.args
             })
