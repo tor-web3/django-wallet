@@ -33,7 +33,7 @@ class AddressListView(View):
         try:
             created_time = request.GET.get("created_time",0)
             timestamp = int(created_time)
-            created_at = timezone.datetime.utcfromtimestamp(timestamp)
+            created_at = timezone.datetime.fromtimestamp(timestamp,timezone.utc)
 
             address_obj_list = Address.objects.filter(
                 created_at__gte=created_at
